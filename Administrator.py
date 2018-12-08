@@ -20,12 +20,14 @@ class AdminUI:
                 if command == 'QUIT':
                     exit = True
                 elif command == 'BLOCAL':
+                    #Ainda não é o comando correto
                     url = 'http://127.0.0.1:5000/API/Admin/GetBuildsLocations'
                     r = requests.get(url)
                     print(r.status_code)
                     data = r.json()
                     print(data)
                 elif command == 'LISTLOGGED':
+                    #Está a fazer a ligaçao direta à BD, mas depois deve ser feito admin-server-bd-server-admin
                     collection = db.logs
                     for obj in collection.find():
                         pprint.pprint(obj)
@@ -39,6 +41,7 @@ class AdminUI:
                     for obj in collection.find({"localization": "Alameda"}):
                         pprint.pprint(obj)
                 elif command == 'USERHIST':
+                    #Ainda não é o comando correto
                     url = 'http://127.0.0.1:5000/API/Admin/GetListHistory'
                     r = requests.get(url)
                     print(r.status_code)

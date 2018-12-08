@@ -16,6 +16,7 @@ def hello_world():
 
 @app.route('/API/Admin/GetBuildsLocations')
 def BuildsLocations():
+	#Isto está errado. É suposto o administrador fornecer o ficheiro com os edificios e localizaçoes, o server mete tudo na BD
     return jsonify(str( {"type" : "CAMPUS","id" : "2448131360898","name" : "Taguspark","containedSpaces" : [ {"type" : "BUILDING","id" : "2448131365084","name" : "Edifício principal","topLevelSpace" : {"type" : "CAMPUS","id" : "2448131360898","name" : "Taguspark"}} ]}))
 
 @app.route('/API/Admin/GetListAllUsersLogged', methods=['GET'])
@@ -32,14 +33,15 @@ def getUserHistory():
 
 @app.route('/API/User/init', methods=['POST'])
 def Getusert():
+	#para receber o token do user (ainda nao funciona)
 	content = request.get_json()
-	print("RRRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEECCCCCCCCCCCEBBBBBBBBBBIIIIIIIIIII")
 	print(content["name"])
 	print(content["url"])
 	return jsonify( [{"result": "ACK init"}] )
 
 @app.route('/API/User/PostmyLocation', methods=['POST'])
 def PostmyLocal():
+	#User envia localizaçao e nome e atualiza. Isto depois deve atualizar na BD
 	content = request.get_json()
 	print(content["name"])
 	print(content["location"])
