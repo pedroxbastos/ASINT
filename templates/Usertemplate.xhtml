@@ -21,10 +21,42 @@
 <div class="background" id="locationspot">(Location will be here)</div>
 <div class="background" id="serverresp">(Server response)</div>
 <h2>Links</h2>
+<input type="text" name="" size="20" id="Messagetosend" />
+<input type="submit" value="Send"  id="Sendbutton"/>
+<button type="button" id="Recvbutton">Receive Messages</button>
+<div id="fieldMsg">(Messages will be here)</div>
+
 
 <script>
  //<![CDATA[
-    var periodiclocal = setInterval(geoLocal,3000);
+
+     function sendtokencode(fn, context) { 
+        var result;
+        var url1 = window.location.search;
+        postData = {"code": url1};
+        return function() { 
+            $.ajax({
+                type: "POST",
+                url: "http://127.0.0.1:5002/User/getToken",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(postData),
+                dataType: 'json',
+                success: function (response) {
+                    console.log(response);
+                }
+                })
+                fn=null;
+        }
+        return result;
+    };
+
+    // Usage
+    var canOnlyFireOnce = sendtokencode(function() {
+        console.log('Fired!');
+    });
+    canOnlyFireOnce(); // "Fired!"
+
+    //var periodiclocal = setInterval(geoLocal,5000);
     var x = document.getElementById("locationspot");
     function geoLocal() {
         if (navigator.geolocation) {
@@ -42,7 +74,8 @@
         var lat = position.coords.latitude;
         var lon = position.coords.longitude;
         var result = document.getElementById("serverresp");
-        postData = {"name": "istxxxxxx", "location":[lat,lon]};
+        var authname = document.getElementById("authenticate");
+        postData = {"name": authname.innerHTML, "location":[lat,lon]};
 
         $.ajax({
             type: "POST",
@@ -55,7 +88,57 @@
             }
         })
     }
+    $( document ).ready(function() {
+        $( "#Sendbutton" ).click(function( event ) {
+            var authname = document.getElementById("authenticate").innerHTML;
+            console.log("click");
+            $.ajax({
+                type: "POST",
+                url: "http://127.0.0.1:5000/API/User/SendBroadMsg",
+                dataType: "json",
+                contentType: "application/json",
+                data: '{"name":"' + authname + '","Message":"' + $("#Messagetosend").val() + '"}',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+    });
 
+    $( document ).ready(function() {
+        $( "#Recvbutton" ).click(function( event ) {
+            var authname = document.getElementById("authenticate").innerHTML;
+            console.log("click");
+            $.ajax({
+                type: "GET",
+                url: "http://127.0.0.1:5000/API/User/RecvMsg/"+authname,
+                dataType: "json",
+                contentType: "application/json",
+                success: function (data) {
+                    console.log(data);
+                        s = "<ol>";
+                        //for (var i = 0, len = data.length; i < len; i++) {
+                        //    s += "<li>";
+                        //    s += data[i];
+                        //    s += "</li>";
+                        //}
+                        s="Messages Received:"
+                        for (var key in data) {
+                            if (data.hasOwnProperty(key)) {
+                                console.log(key + " -> " + data[key]);
+                                for (var i = 0, len = data[key].length; i < len; i++) {
+                                s += "<li>";
+                                s += data[key][i]
+                                s += "</li>";   
+                                }                            
+                        }
+                        }
+                        s += "</ol>";
+                        $("#fieldMsg").html(s);
+                }
+        });
+    });
+    });
 
  //]]>
 </script>
