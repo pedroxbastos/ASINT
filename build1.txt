@@ -6,10 +6,12 @@
     "type" : "BUILDING",
     "id" : "2448131365084",
     "name" : "Edifício principal",
+    "latitude" : "38.737321",
+    "longitude" : "-9.303025",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360898",
       "name" : "Taguspark"
     }
   } ]
-}
+}	

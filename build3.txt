@@ -6,6 +6,8 @@
     "type" : "ROOM",
     "id" : "1691297991622710",
     "name" : "Biblioteca",
+    "latitude" : "38.812810",
+    "longitude" : "-9.094038",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131392438",
@@ -15,6 +17,8 @@
     "type" : "BUILDING",
     "id" : "1691297991622660",
     "name" : "Liq. Hélio / LETAL",
+    "latitude" : "38.813296",
+    "longitude" : " -9.092652",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131392438",
@@ -24,6 +28,8 @@
     "type" : "ROOM",
     "id" : "283923108069473",
     "name" : "DPRSN - Proteção e Segurança Radiológica",
+    "latitude" : "38.812151",
+    "longitude" : " -9.093395",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131392438",
@@ -33,6 +39,8 @@
     "type" : "ROOM",
     "id" : "283923108069461",
     "name" : "DPRSN Armazém",
+    "latitude" : "38.812097",
+    "longitude" : "-9.094506",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131392438",
@@ -42,6 +50,8 @@
     "type" : "ROOM",
     "id" : "1691297991622663",
     "name" : "Administração",
+    "latitude" : "38.811831",
+    "longitude" : "-9.094022",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131392438",
@@ -51,6 +61,8 @@
     "type" : "ROOM",
     "id" : "1691297991622851",
     "name" : "DPRSN_dosimetria",
+    "latitude" : "38.811191",
+    "longitude" : "-9.094345",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131392438",
@@ -60,6 +72,8 @@
     "type" : "ROOM",
     "id" : "846873061490709",
     "name" : "Física",
+    "latitude" : "38.811521",
+    "longitude" : "-9.094856",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131392438",
