@@ -1,10 +1,12 @@
 from flask import Flask, url_for
 from flask import jsonify, redirect
 from flask import request, render_template
+from flask import sessions
 from pymongo import MongoClient, errors
 import pprint
 import json
 import fenixedu
+import requests
 from math import radians, cos, sin, asin, sqrt
 import datetime
 
@@ -34,7 +36,8 @@ urltrue = None"""
 def hello_world():
 	return render_template("siteinit.xhtml") 
 
-config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5000/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
+#config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5000/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
+config = fenixedu.FenixEduConfiguration('851490151333943', 'http://127.0.0.1:5000/User/Mainpage', 'pod5dif2wxgTGshS3fxEsp5zY2pfsukCfeUH0pnHv20ye58x1ZflOuaDTx9OxPQlNz8VyfTjdddPyz/RBgTlpw==', 'https://fenix.tecnico.ulisboa.pt/')
 client = fenixedu.FenixEduClient(config)
 url = client.get_authentication_url()
 
@@ -46,21 +49,40 @@ def login_fenix():
 	onID += 1
 	return redirect(url, code=302)
 	
-@app.route('/User/Mainpage')
+@app.route('/User/Mainpage', methods = ['POST', 'GET'])
 def main_user():
 	global onID
+	print("mainpage!")
+	if request.method == 'GET':
+		code = request.args.get('code')
+		print(code)
+	elif request.method == 'POST':
+		print("post")
+
+	auth_url="https://fenix.tecnico.ulisboa.pt/oauth/access_token?client_id="+ config.client_id + "&client_secret="+config.client_secret +"&redirect_uri="+ config.redirect_uri +"&code=" + code + "&grant_type=authorization_code"
+	r = requests.post(auth_url)
+	t = r.json()
+	access_token = t['access_token']
+	print("Acess token: %s" % access_token)
+	refresh_token = t['refresh_token']
+	print("Refresh token: %s" % refresh_token)
+	r2 = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params={"access_token":access_token})
+	print(r2.json()['name'])
 	return render_template("Usertemplate.xhtml", LoginId = UsersOn[onID-1])
 
 @app.route('/User/getToken', methods=['POST'])
 def getToken():
+	test = request.json
+	#print(test['code'])
+	#print("endtest")
 	content = request.get_json()
-	print(str(content))
-	print(str(content["code"]))
-	print(str(content["code"]).split('=')[1])
+	#print(str(content))
+	#print(str(content["code"]))
+	#print(str(content["code"]).split('=')[1])
 	#url = "http://127.0.0.1:5000/API/User/Tokencode"
 	user = client.get_user_by_code(str(content["code"]).split('=')[1])
 	person = client.get_person(user)
-	print(person)
+	#print(person)
 	#r = r.json()
 	#print(data)
 	#print(user)
@@ -70,22 +92,6 @@ def getToken():
 	#new2 = json.loads(person)	
 	#json.dumps(new2, indent=4, sort_keys=True)
 	return jsonify( [{"result": "Logs updated"}] )
-"""
-@app.route('/')
-def hello_world():
-	return render_template("siteinit.xhtml")
-
-@app.route('/User/Login', methods=['POST'])
-def userLogin():
-	newuserID =
-	userID =1
-	curr_building = getBuilding(lat, long)
-	return redirect(url_for('userHomepage'), userID = newuserID, building = curr_building)
-
-@app.route('/User/Homepage/<userID>')
-def userHomepage(userID, building):
-
-	return"""
 
 
 

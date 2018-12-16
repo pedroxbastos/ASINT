@@ -23,7 +23,7 @@
 <h2>Links</h2>
 <input type="text" name="" size="20" id="Messagetosend" />
 <input type="submit" value="Send"  id="Sendbutton"/>
-<p>
+<p></p>
 <button type="button" id="Recvbutton">Receive Messages</button>
 <div id="fieldMsg">(Messages will be here)</div>
 
@@ -55,7 +55,7 @@
     var canOnlyFireOnce = sendtokencode(function() {
         console.log('Fired!');
     });
-    canOnlyFireOnce(); // "Fired!"
+    //canOnlyFireOnce(); // "Fired!"
 
     var periodiclocal = setInterval(geoLocal,5000);
     var x = document.getElementById("locationspot");
