@@ -44,7 +44,7 @@ url = client.get_authentication_url()
 @app.route('/User/Login')
 def login_fenix():
 	global onID
-	UsersOn[onID] = str(request.args["LoginId"])
+	UsersOn[onID] = {"name":str(request.args["LoginId"])}
 	print(UsersOn)
 	onID += 1
 	return redirect(url, code=302)
@@ -67,8 +67,16 @@ def main_user():
 	refresh_token = t['refresh_token']
 	print("Refresh token: %s" % refresh_token)
 	r2 = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params={"access_token":access_token})
+
+	UsersOn[onID-1]['access_token']=access_token
+	UsersOn[onID-1]['refresh_token']=refresh_token
+	UsersOn[onID-1]['Location']=None
+	UsersOn[onID-1]['Building']=None
+	UsersOn[onID-1]['Campus']=None
+	UsersOn[onID-1]['Range']=100 #default
+	Messages[UsersOn[onID-1]['name']] = []
 	print(r2.json()['name'])
-	return render_template("Usertemplate.xhtml", LoginId = UsersOn[onID-1])
+	return render_template("Usertemplate.xhtml", LoginId = UsersOn[onID-1]['name'])
 
 @app.route('/User/getToken', methods=['POST'])
 def getToken():
@@ -210,12 +218,21 @@ def PostmyLocal():
 	content = request.get_json()
 	print(content)
 	print(content["name"])
-	localisation={"Latitude": content["location"][0], "Longitude":content["location"][1]}
-	for obj in collection.find({"name": content["name"]}):
-		collection.update_one({"name": content["name"]}, {"$set": {"localisation": localisation}})
-		pprint.pprint(obj)
-		break
-	return jsonify( [{"result": "Logs updated"}] )
+	location=[content["location"][0], content["location"][1]]
+	building,campus = getBuilding(int(content["location"][0]), int(content["location"][1]))
+	obj = {"type": "move", "user": content["name"], "date": datetime.datetime.now()}
+	for i, value in UsersOn.items():
+		if value['name']==str(content["name"]):
+			if value['Location'] != location:
+				value['Location']=[content["location"][0],content["location"][1]]
+				value['Building'],value['Campus']=building,campus
+				print(value['Building'], value['Campus'])
+				obj['Location']=value['Location']
+				obj['Building']=value['Building']
+				obj['Campus']=value['Campus']
+				collection.insert_one(obj)
+				return jsonify( [{"result": "Logs updated"}] )
+	return jsonify( [{"result": "Same Location"}] )
 
 @app.route('/API/User/SendBroadMsg/<idName>', methods=['POST'])
 def SendMsg(idName):
@@ -223,22 +240,32 @@ def SendMsg(idName):
 	content = request.get_json()
 	objself=None
 	for key,value in UsersOn.items():
-		if idName == value:
+		if idName == value['name']:
 			objself=key
+			print(objself)
 		break
 	for obj, value in UsersOn.items():
 		if obj != objself:
-			if value in Messages:
-				Messages[value].append(content["Message"])
-			else:
-				Messages[value]= []
-				Messages[value].append(content["Message"])
+			print(value)
+			if calculateDistance(value['Location'][0], value['Location'][1], UsersOn[objself]['Location'][0], UsersOn[objself]['Location'][1]) < UsersOn[objself]['Range']:
+				Messages[value['name']].append(content["Message"])
+
 	print(Messages)
+	obj = {"type": "Message", "user": UsersOn[objself]['name'], "date": datetime.datetime.now(), "content":content["Message"]}
+	collection.insert_one(obj)
 	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
 
-@app.route('/API/User/DefineDistance', methods=['POST'])
-def DefineRange():
-	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
+@app.route('/API/User/DefineRange/<idName>', methods=['POST'])
+def DefineRange(idName):
+	content = request.get_json()
+	for key,value in UsersOn.items():
+		if idName == value['name']:
+			objself=key
+			print(objself)
+		break
+	UsersOn[objself]['Range']=int(content["Range"])
+	print("range:"+str(UsersOn[objself]['Range']))
+	return jsonify( {"Result":"Range updated" })
 
 @app.route('/API/User/RecvMsg/<idUser>', methods=['GET'])
 def RecvMsg(idUser):
@@ -275,9 +302,9 @@ def getBuilding(lat, long):
 			min_range = d
 			building = c['building']
 	if min_range == 31:
-		return "No building."
+		return None, None
 	else:
-		return building
+		return building, campus
 
 
 def calculateDistance(b_lat, b_long, u_lat, u_long):
