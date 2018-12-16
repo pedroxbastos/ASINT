@@ -1,6 +1,6 @@
-from flask import Flask
-from flask import jsonify
-from flask import request
+from flask import Flask, url_for
+from flask import jsonify, redirect
+from flask import request, render_template
 from pymongo import MongoClient, errors
 import pprint
 import json
@@ -20,11 +20,28 @@ Messages = {}
 app = Flask(__name__)
 client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
 db = client['asint']
+config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5002/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
+client = fenixedu.FenixEduClient(config)
+url = client.get_authentication_url()
 
 
 @app.route('/')
 def hello_world():
-	return 'Hello World!'
+	return render_template("siteinit.xhtml")
+
+@app.route('/User/Login', methods=['POST'])
+def userLogin():
+	newuserID =
+	userID =1
+	curr_building = getBuilding(lat, long)
+	return redirect(url_for('userHomepage'), userID = newuserID, building = curr_building)
+
+@app.route('/User/Homepage/<userID>')
+def userHomepage(userID, building):
+
+	return
+
+
 
 #  Admin API
 @app.route('/API/Admin/GetBuildsLocations', methods=['POST'])
@@ -125,11 +142,11 @@ def redirectURLforuser():
 
 @app.route('/API/User/Tokencode', methods=['POST'])
 def getUtoken():
-	config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5002/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
-	client = fenixedu.FenixEduClient(config)
+	config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5000/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
+	client_ = fenixedu.FenixEduClient(config)
 	content = request.get_json()
 	user = client.get_user_by_code(str(content["code"]).split('=')[1])
-	person = client.get_person(user)
+	person = client_.get_person(user)
 	return jsonify( [{"result": "Token successfull"}] )
 
 
@@ -182,18 +199,39 @@ def RecvMsg():
 
 #Outros
 
+
+def getBuilding(lat, long):
+	#  Given the user's coordinates, returns the building where the user is
+	if lat >38.8:
+		campus="nuclear"
+	elif long < -9.2:
+		campus="taguspark"
+	else:
+		campus="alameda"
+	collection = db[campus]
+	min_range = 31.0
+	building = ""
+	for c in collection.find():
+		d = calculateDistance(c['latitude'], c['longitude'], lat, long)
+		if d < min_range:
+			min_range = d
+			building = c['building']
+	if min_range == 31:
+		return "No building."
+	else:
+		return building
+
+
 def calculateDistance(b_lat, b_long, u_lat, u_long):
-	#  30m range; haversine formula.
+	#  haversine formula. Returns the distance between 2 coordinate points in meters
 	b_lat, b_long, u_lat, u_long = map(radians, [b_lat, b_long, u_lat, u_long])
 	dlon = b_long - u_long
 	dlat = b_lat - u_lat
 	a = sin(dlat / 2) ** 2 + cos(b_lat) * cos(u_lat) * sin(dlon / 2) ** 2
 	c = 2 * asin(sqrt(a))
 	r = 6371 * 1000  # Radius of earth in meters.
-	if c*r >=30:
-		return False
-	else:
-		return True
+	return c*r
+
 
 
 if __name__ == '__main__':
