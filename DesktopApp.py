@@ -7,7 +7,7 @@ def main():
         admin.menu()
         exit()
     else:
-        print("Exiting app due to bad authetication.")
+        print("Exiting app due to bad authentication.")
         exit()
 
 if __name__ == "__main__":

@@ -20,14 +20,14 @@ class message_log:
 class move_log:
 
     def __init__(self, checkin, checkout, user, building_id, campus):
-        self.checkin = checkin
+        self.date = checkin
         self.checkout = checkout
         self.user = user
         self.building_id = building_id
         self.campus = campus
 
     def __str__(self):
-        return "LogType: Move. User %s - Checkin: %s, Checkout %s; Building %s, Campus %s" % (self.user, self.checkin, self.checkout, self.building_id, self.campus)
+        return "LogType: Move. User %s - Checkin: %s, Checkout %s; Building %s, Campus %s" % (self.user, self.date, self.checkout, self.building_id, self.campus)
 
     def toDict(self):
         return {"type" : "move", "user" : self.user, "checkin" : self.checkin, "checkout" : self.checkout, "building" : self.building_id, "campus" : self.campus}

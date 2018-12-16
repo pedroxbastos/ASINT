@@ -2,6 +2,8 @@ import requests
 import getpass
 import json
 import building
+import datetime
+from Logs import message_log, move_log
 
 class AdminUI:
     def auth(self):
@@ -23,18 +25,21 @@ class AdminUI:
         #db = client.asint
         while not exit_:
             print("Choose the function to be executed with its name:")
-            l = input("\n1-blocal(Insert Building Location)\n"
-                      "2-ListLogged(List user logged in)\n"
-                      "3-ListInside(List users inside a building)\n"
-                      "4-UserHist(History of a user)\n"
-                      "5-quit?\n"
-                      "6-listbuildings\n")
+            l = input("\n1-blocal -Insert Building Location\n"
+                      "2-ListLogged -List users logged in\n"
+                      "3-ListInside -List users inside a building\n"
+                      "4-UserHist - History of a user\n"
+                      "5-listbuildings - List available buildings\n"
+                      "6-AddBot - add a messaging bot\n"
+                      "7-quit\n")
             l = l.split()
             if len(l) == 1:
                 command = l[0].upper()
                 if command == 'QUIT':
                     print("Exiting app by user request.")
                     exit_ = True
+                elif command == "INSERT":
+                    self.insertLog()
                 elif command == 'BLOCAL':
                     self.insertBuildings()
                 elif command == 'LISTBUILDINGS':
@@ -45,11 +50,9 @@ class AdminUI:
                     else:
                         print("Wrong campus choice. PLease try again.")
 
-                # elif command == 'LISTLOGGED':
-                #     #Está a fazer a ligaçao direta à BD, mas depois deve ser feito admin-server-bd-server-admin
-                #     collection = db.logs
-                #     for obj in collection.find():
-                #         pprint.pprint(obj)
+                elif command == 'LISTLOGGED':
+                    self.listLogged()
+
                 elif command == 'LISTINSIDE':
                     campus = input("which campus?")
                     if campus not in ["taguspark", "alameda", "nuclear"]:
@@ -58,13 +61,13 @@ class AdminUI:
                         buildingID = input("Which building ID?")
                         self.listInside(buildingID, campus)
 
-                # elif command == 'USERHIST':
-                #     #Ainda não é o comando correto
-                #     url = 'http://127.0.0.1:5000/API/Admin/GetListHistory'
-                #     r = requests.get(url)
-                #     print(r.status_code)
-                #     data = r.json()
-                #     print(data)
+                elif command == 'USERHIST':
+                    userID = input("What is the userID? ")
+                    if userID[:3] != "ist":
+                        print("Wrong input")
+                    else:
+                        self.getHistory(userID)
+
 
     def insertBuildings(self):
         #  Select campus
@@ -109,6 +112,20 @@ class AdminUI:
         payload = {"building_id" : buildingID, "campus" : campus}
         r = requests.post("http://127.0.0.1:5000/API/Admin/GetListAllUsersInBuild", json=payload)
         data = r.json()
+        try:
+            new = json.loads(data.replace("'", "\""))
+            if len(new) == 0:
+                print("vazia")
+            for i in new:
+                print(i)
+        except:
+            pass
+        return
+
+    def getHistory(self, userID):
+        payload = {"userID": userID}
+        r = requests.post("http://127.0.0.1:5000/API/Admin/GetListHistory", json=payload)
+        data = r.json()
         print(type(data))
         print(data.replace("'", "\""))
         try:
@@ -122,12 +139,32 @@ class AdminUI:
             pass
         return
 
-    def getHistory(self, userID):
-        print(userID)
+    def listLogged(self):
+        r = requests.post("http://127.0.0.1:5000/API/Admin/")
+        print("TODO")
         return
 
-    def listLogged(selfs):
+    def insertBot(self):
         print("TODO")
+        return
+
+    def insertLog(self):
+        type = input("type: ")
+        if type == "message":
+            to = input("To: ")
+            from_ = input("From: ")
+            msg = input("msg? ")
+            date = str(datetime.datetime.now())
+            l = message_log(date, to, from_,msg, "1", "nuclear")
+        else:
+            userID = input("userID: ")
+            date = str(datetime.datetime.now())
+            l = move_log(date, "0", userID, "1", "nuclear")
+
+        print(l)
+        payload = json.dumps(l.toDict())
+        r = requests.post("http://127.0.0.1:5000/API/insert", json=payload)
+        print(r.status_code)
         return
 
 
