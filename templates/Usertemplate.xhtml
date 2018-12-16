@@ -23,12 +23,9 @@
 <h2>Links</h2>
 <input type="text" name="" size="20" id="Messagetosend" />
 <input type="submit" value="Send"  id="Sendbutton"/>
+<p>
 <button type="button" id="Recvbutton">Receive Messages</button>
 <div id="fieldMsg">(Messages will be here)</div>
-
-<form action="https://127.0.0.1:5000/API/User/Logout" method="post">
-    <input type="hidden" value = {{LoginID}}
-</form>
 
 
 <script>
@@ -41,7 +38,7 @@
         return function() { 
             $.ajax({
                 type: "POST",
-                url: "http://127.0.0.1:5002/User/getToken",
+                url: "http://127.0.0.1:5000/User/getToken",
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(postData),
                 dataType: 'json',
@@ -60,7 +57,7 @@
     });
     canOnlyFireOnce(); // "Fired!"
 
-    //var periodiclocal = setInterval(geoLocal,5000);
+    var periodiclocal = setInterval(geoLocal,5000);
     var x = document.getElementById("locationspot");
     function geoLocal() {
         if (navigator.geolocation) {
@@ -98,7 +95,7 @@
             console.log("click");
             $.ajax({
                 type: "POST",
-                url: "http://127.0.0.1:5000/API/User/SendBroadMsg",
+                url: "http://127.0.0.1:5000/API/User/SendBroadMsg/"+authname,
                 dataType: "json",
                 contentType: "application/json",
                 data: '{"name":"' + authname + '","Message":"' + $("#Messagetosend").val() + '"}',

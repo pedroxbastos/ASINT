@@ -11,6 +11,8 @@ import datetime
 
 
 Messages = {}
+UsersOn = {}
+onID = 0
 
 #logs = {}
 
@@ -20,11 +22,55 @@ Messages = {}
 app = Flask(__name__)
 client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
 db = client['asint']
-config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5002/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
+"""class user:
+	def __init__(self, name):
+		self.name=name
+"""
+
+"""
+newuser = user(None)
+urltrue = None"""
+@app.route('/')
+def hello_world():
+	return render_template("siteinit.xhtml") 
+
+config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5000/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
 client = fenixedu.FenixEduClient(config)
 url = client.get_authentication_url()
 
+@app.route('/User/Login')
+def login_fenix():
+	global onID
+	UsersOn[onID] = str(request.args["LoginId"])
+	print(UsersOn)
+	onID += 1
+	return redirect(url, code=302)
+	
+@app.route('/User/Mainpage')
+def main_user():
+	global onID
+	return render_template("Usertemplate.xhtml", LoginId = UsersOn[onID-1])
 
+@app.route('/User/getToken', methods=['POST'])
+def getToken():
+	content = request.get_json()
+	print(str(content))
+	print(str(content["code"]))
+	print(str(content["code"]).split('=')[1])
+	#url = "http://127.0.0.1:5000/API/User/Tokencode"
+	user = client.get_user_by_code(str(content["code"]).split('=')[1])
+	person = client.get_person(user)
+	print(person)
+	#r = r.json()
+	#print(data)
+	#print(user)
+	#new = json.loads(jsonify(user))
+	#json.dumps(new, indent=4, sort_keys=True)
+	#person = client.get_person(user)
+	#new2 = json.loads(person)	
+	#json.dumps(new2, indent=4, sort_keys=True)
+	return jsonify( [{"result": "Logs updated"}] )
+"""
 @app.route('/')
 def hello_world():
 	return render_template("siteinit.xhtml")
@@ -39,7 +85,7 @@ def userLogin():
 @app.route('/User/Homepage/<userID>')
 def userHomepage(userID, building):
 
-	return
+	return"""
 
 
 
@@ -165,21 +211,22 @@ def PostmyLocal():
 		break
 	return jsonify( [{"result": "Logs updated"}] )
 
-@app.route('/API/User/SendBroadMsg', methods=['POST'])
-def SendMsg():
+@app.route('/API/User/SendBroadMsg/<idName>', methods=['POST'])
+def SendMsg(idName):
 	collection = db.logs
 	content = request.get_json()
 	objself=None
-	for obj in collection.find({"name": content["name"]}):
-		objself=obj
+	for key,value in UsersOn.items():
+		if idName == value:
+			objself=key
 		break
-	for obj in collection.find():
+	for obj, value in UsersOn.items():
 		if obj != objself:
-			if obj["name"] in Messages:
-				Messages[obj["name"]].append(content["Message"])
+			if value in Messages:
+				Messages[value].append(content["Message"])
 			else:
-				Messages[obj["name"]]= []
-				Messages[obj["name"]].append(content["Message"])
+				Messages[value]= []
+				Messages[value].append(content["Message"])
 	print(Messages)
 	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
 
@@ -187,10 +234,15 @@ def SendMsg():
 def DefineRange():
 	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
 
-@app.route('/API/User/RecvMsg', methods=['GET'])
-def RecvMsg():
-	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
-
+@app.route('/API/User/RecvMsg/<idUser>', methods=['GET'])
+def RecvMsg(idUser):
+	collection = db.logs
+	data = {}
+	for key,values in Messages.items():
+		if key == idUser:
+			data[key] = values
+			Messages[key] = []
+	return jsonify(data)
 
 # Bots API
 
