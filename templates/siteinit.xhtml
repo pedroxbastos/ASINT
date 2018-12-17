@@ -18,12 +18,31 @@
 
 
 <h2>IST Distributed Message App</h2>
-<h3>Please login with your istID.</h3>
-
-<form action="/User/Login" method="get">
-    LoginId:    <input type="text" name="LoginId"><br>
-    <input type="submit" value="Login">
+{% if session.logged_in %}
+    <h3> Welcome {{session.name}} - {{session.username}}</h3>
+    <form action="/User/Mainpage" method="post">
+            <button type="submit" id="btn">Go to your Mainpage</button>
     </form>
+
+
+{% else %}
+    <h3>Please login with your istID.</h3>
+    {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      <li>{{ messages[0] }}</li>
+    </ul>
+  {% endif %}
+{% endwith %}
+
+    <form action="/User/Login" method="get">
+        LoginId:    <input type="text" name="LoginId"><br></br>
+        <input type="submit" value="Login"></input>
+    </form>
+{% endif %}
+
+
+
 </body>
 
 

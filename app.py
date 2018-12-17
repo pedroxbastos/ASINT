@@ -1,7 +1,7 @@
 from flask import Flask, url_for
 from flask import jsonify, redirect
 from flask import request, render_template
-from flask import sessions
+from flask import session, flash
 from pymongo import MongoClient, errors
 import pprint
 import json
@@ -9,6 +9,7 @@ import fenixedu
 import requests
 from math import radians, cos, sin, asin, sqrt
 import datetime
+from functools import wraps
 
 
 
@@ -22,6 +23,7 @@ onID = 0
 #	logs.update({name:Location})
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Qaz\n\xec]/'
 client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
 db = client['asint']
 """class user:
@@ -41,14 +43,37 @@ config = fenixedu.FenixEduConfiguration('851490151333943', 'http://127.0.0.1:500
 client = fenixedu.FenixEduClient(config)
 url = client.get_authentication_url()
 
+
+def login_required(f):
+	@wraps(f)
+	def wrap(*args, **kwargs):
+		if 'logged_in' in session:
+			return f(*args, **kwargs)
+		else:
+			return render_template("siteinit.xhtml")
+	return wrap
+
+
+
 @app.route('/User/Login')
 def login_fenix():
-	global onID
-	UsersOn[onID] = {"name":str(request.args["LoginId"])}
-	print(UsersOn)
-	onID += 1
+	# global onID
+	# UsersOn[onID] = {"name":str(request.args["LoginId"])}
+	# print(UsersOn)
+	# onID += 1
 	return redirect(url, code=302)
-	
+
+
+@app.route("/User/Logout", methods = ["POST"])
+@login_required
+def logout():
+	print("logout")
+	session.clear()
+	print(url_for('hello_world'))
+	return redirect(url_for('hello_world'))
+	#return render_template("siteinit.xhtml")
+
+
 @app.route('/User/Mainpage', methods = ['POST', 'GET'])
 def main_user():
 	global onID
@@ -56,27 +81,36 @@ def main_user():
 	if request.method == 'GET':
 		code = request.args.get('code')
 		print(code)
+		if code is None:
+			flash("There was an error. Try again.")
+			return redirect((url_for('hello_world')))
 	elif request.method == 'POST':
 		print("post")
+	if not session:
+		auth_url="https://fenix.tecnico.ulisboa.pt/oauth/access_token?client_id="+ config.client_id + "&client_secret="+config.client_secret +"&redirect_uri="+ config.redirect_uri +"&code=" + code + "&grant_type=authorization_code"
+		r = requests.post(auth_url)
+		t = r.json()
+		access_token = t['access_token']
+		print("Acess token: %s" % access_token)
+		refresh_token = t['refresh_token']
+		print("Refresh token: %s" % refresh_token)
+		r2 = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params={"access_token":access_token})
 
-	auth_url="https://fenix.tecnico.ulisboa.pt/oauth/access_token?client_id="+ config.client_id + "&client_secret="+config.client_secret +"&redirect_uri="+ config.redirect_uri +"&code=" + code + "&grant_type=authorization_code"
-	r = requests.post(auth_url)
-	t = r.json()
-	access_token = t['access_token']
-	print("Acess token: %s" % access_token)
-	refresh_token = t['refresh_token']
-	print("Refresh token: %s" % refresh_token)
-	r2 = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params={"access_token":access_token})
+		session['username'] = r2.json()['username']
+		session['name'] = r2.json()['name']
+		session['logged_in'] = True
+		print(r2.json()['name'])
+	else:
+		print("not")
+	# UsersOn[onID-1]['access_token']=access_token
+	# UsersOn[onID-1]['refresh_token']=refresh_token
+	# UsersOn[onID-1]['Location']=None
+	# UsersOn[onID-1]['Building']=None
+	# UsersOn[onID-1]['Campus']=None
+	# UsersOn[onID-1]['Range']=100 #default
+	# Messages[UsersOn[onID-1]['name']] = []
 
-	UsersOn[onID-1]['access_token']=access_token
-	UsersOn[onID-1]['refresh_token']=refresh_token
-	UsersOn[onID-1]['Location']=None
-	UsersOn[onID-1]['Building']=None
-	UsersOn[onID-1]['Campus']=None
-	UsersOn[onID-1]['Range']=100 #default
-	Messages[UsersOn[onID-1]['name']] = []
-	print(r2.json()['name'])
-	return render_template("Usertemplate.xhtml", LoginId = UsersOn[onID-1]['name'])
+	return render_template("Usertemplate.xhtml", LoginId = session['name'])
 
 @app.route('/User/getToken', methods=['POST'])
 def getToken():

@@ -17,8 +17,10 @@
 <body>
 
 
-<div class="background" id="authenticate">{{LoginId}}</div>
+<div class="background" id="authenticate">{{session.username}}</div>
+<div class="background" id="name">{{session.name}}</div>
 <div class="background" id="locationspot">(Location will be here)</div>
+<div class="background" id="b_infor">TODO building atm</div>
 <div class="background" id="serverresp">(Server response)</div>
 <h2>Commands</h2>
 <input type="text" name="" size="20" id="Range" />
@@ -29,37 +31,16 @@
 <p></p>
 <button type="button" id="Recvbutton">Receive Messages</button>
 <div id="fieldMsg">(Messages will be here)</div>
+<form action = "/User/Logout" method = 'post'>
+   <button type ="submit" id="Logout" value="Logout">Logout</button>
+</form>
+
 
 
 
 <script>
  //<![CDATA[
 
-     function sendtokencode(fn, context) { 
-        var result;
-        var url1 = window.location.search;
-        postData = {"code": url1};
-        return function() { 
-            $.ajax({
-                type: "POST",
-                url: "http://127.0.0.1:5000/User/getToken",
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(postData),
-                dataType: 'json',
-                success: function (response) {
-                    console.log(response);
-                }
-                })
-                fn=null;
-        }
-        return result;
-    };
-
-    // Usage
-    var canOnlyFireOnce = sendtokencode(function() {
-        console.log('Fired!');
-    });
-    //canOnlyFireOnce(); // "Fired!"
     geoLocal();
     var periodiclocal = setInterval(geoLocal,5000);
     var x = document.getElementById("locationspot");
