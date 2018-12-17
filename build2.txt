@@ -6,6 +6,8 @@
     "type" : "BUILDING",
     "id" : "2448131361069",
     "name" : "Pavilhão de Acção Social",
+    "latitude" : "38.736435",
+    "longitude" : "-9.136951",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -15,6 +17,8 @@
     "type" : "BUILDING",
     "id" : "2448131361173",
     "name" : "Pavilhão de Informática II",
+    "latitude" : "38.737251",
+    "longitude" : "-9.137842",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -24,6 +28,8 @@
     "type" : "BUILDING",
     "id" : "2448131361139",
     "name" : "Pavilhão de Minas",
+    "latitude" : "38.735749",
+    "longitude" : "-9.138428",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -33,6 +39,8 @@
     "type" : "BUILDING",
     "id" : "2448131371435",
     "name" : "Infantário",
+    "latitude" : "38.735816",
+    "longitude" : "-9.139428",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -42,6 +50,8 @@
     "type" : "BUILDING",
     "id" : "2448131361024",
     "name" : "Pavilhão de Electricidade",
+    "latitude" : "38.737827",
+    "longitude" : "-9.138710",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -51,6 +61,8 @@
     "type" : "BUILDING",
     "id" : "2448131377838",
     "name" : "Secção de Folhas",
+    "latitude" : "38.736350",
+    "longitude" : "-9.137817",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -60,6 +72,8 @@
     "type" : "BUILDING",
     "id" : "2448131361091",
     "name" : "Torre Norte",
+    "latitude" : "38.737568",
+    "longitude" : "-9.138585",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -69,6 +83,8 @@
     "type" : "BUILDING",
     "id" : "2448131361074",
     "name" : "Torre Sul",
+    "latitude" : "38.736004",
+    "longitude" : "-9.138443",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -78,6 +94,8 @@
     "type" : "BUILDING",
     "id" : "2448131361042",
     "name" : "Pavilhão de Civil",
+    "latitude" : "38.737406",
+    "longitude" : "-9.140215",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -87,6 +105,8 @@
     "type" : "BUILDING",
     "id" : "2448131361133",
     "name" : "Pavilhão de Informática I",
+    "latitude" : "38.737910",
+    "longitude" : "-9.137776",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -96,6 +116,8 @@
     "type" : "BUILDING",
     "id" : "2448131361109",
     "name" : "Pavilhão de Química",
+    "latitude" : "38.736256",
+    "longitude" : "-9.138519",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -105,6 +127,8 @@
     "type" : "BUILDING",
     "id" : "2448131384238",
     "name" : "Pavilhão da Associação dos  Estudantes",
+    "latitude" : "38.736290",
+    "longitude" : "-9.137194",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -114,6 +138,8 @@
     "type" : "BUILDING",
     "id" : "2448131361051",
     "name" : "Pavilhão de Física",
+    "latitude" : "38.735566",
+    "longitude" : "-9.139640",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -123,6 +149,8 @@
     "type" : "BUILDING",
     "id" : "2448131361155",
     "name" : "Pavilhão de Mecânica III",
+    "latitude" : "38.737404",
+    "longitude" : "-9.137005",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -132,6 +160,8 @@
     "type" : "BUILDING",
     "id" : "2448131361150",
     "name" : "Pavilhão de Mecânica IV",
+    "latitude" : "38.737613",
+    "longitude" : "-9.137882",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -141,6 +171,8 @@
     "type" : "BUILDING",
     "id" : "2448131361035",
     "name" : "Complexo Interdisciplinar",
+    "latitude" : "38.736086",
+    "longitude" : "-9.140118",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -150,6 +182,8 @@
     "type" : "BUILDING",
     "id" : "2448131361176",
     "name" : "Pavilhão do Jardim Norte",
+    "latitude" : "38.737874",
+    "longitude" : "-9.139466",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -159,6 +193,8 @@
     "type" : "BUILDING",
     "id" : "2448131361129",
     "name" : "Pavilhão de Informática III",
+    "latitude" : "38.737729",
+    "longitude" : "-9.137368",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -168,6 +204,8 @@
     "type" : "BUILDING",
     "id" : "2448131361119",
     "name" : "Pavilhão de Matemática",
+    "latitude" : "38.735573",
+    "longitude" : "-9.139958",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -177,6 +215,8 @@
     "type" : "BUILDING",
     "id" : "2448131361175",
     "name" : "Pavilhão do Jardim Sul",
+    "latitude" : "38.735570",
+    "longitude" : "-9.139250",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -186,6 +226,8 @@
     "type" : "BUILDING",
     "id" : "2448131361161",
     "name" : "Pavilhão de Mecânica II",
+    "latitude" : "38.737448",
+    "longitude" : "-9.137405",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -195,6 +237,8 @@
     "type" : "BUILDING",
     "id" : "2448131361165",
     "name" : "Pavilhão de Mecânica I",
+    "latitude" : "38.737337",
+    "longitude" : "-9.138571",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",
@@ -204,6 +248,8 @@
     "type" : "BUILDING",
     "id" : "2448131361060",
     "name" : "Pavilhão Central",
+    "latitude" : "38.736746",
+    "longitude" : "-9.139345",
     "topLevelSpace" : {
       "type" : "CAMPUS",
       "id" : "2448131360897",

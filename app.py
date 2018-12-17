@@ -14,7 +14,7 @@ from functools import wraps
 
 
 Messages = {}
-UsersOn = {}
+UsersOn = []
 onID = 0
 
 #logs = {}
@@ -53,8 +53,6 @@ def login_required(f):
 			return render_template("siteinit.xhtml")
 	return wrap
 
-
-
 @app.route('/User/Login')
 def login_fenix():
 	# global onID
@@ -63,15 +61,17 @@ def login_fenix():
 	# onID += 1
 	return redirect(url, code=302)
 
-
 @app.route("/User/Logout", methods = ["POST"])
 @login_required
 def logout():
-	print("logout")
+	i=0
+	while i < len(UsersOn):
+		if UsersOn[i]['istid'] == session['username']:
+			break
+		i = i+1
+	UsersOn.pop(i)
 	session.clear()
-	print(url_for('hello_world'))
 	return redirect(url_for('hello_world'))
-	#return render_template("siteinit.xhtml")
 
 
 @app.route('/User/Mainpage', methods = ['POST', 'GET'])
@@ -91,17 +91,15 @@ def main_user():
 		r = requests.post(auth_url)
 		t = r.json()
 		access_token = t['access_token']
-		print("Acess token: %s" % access_token)
 		refresh_token = t['refresh_token']
-		print("Refresh token: %s" % refresh_token)
 		r2 = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params={"access_token":access_token})
-
 		session['username'] = r2.json()['username']
 		session['name'] = r2.json()['name']
 		session['logged_in'] = True
-		print(r2.json()['name'])
-	else:
-		print("not")
+		UsersOn.append({'name':r2.json()['name'], "istid": r2.json()['username']})
+		print("USERSON: ")
+		print(UsersOn)
+
 	# UsersOn[onID-1]['access_token']=access_token
 	# UsersOn[onID-1]['refresh_token']=refresh_token
 	# UsersOn[onID-1]['Location']=None
@@ -163,18 +161,23 @@ def BuildsLocations():
 def BuildingList():
 	if request.method == "POST":
 		content = request.json
-		print(content)
-		collection = db[content['campus']]
-		ret = []
-		for c in collection.find({},{'_id': False}):
-			ret.append(c)
-		print(type(ret))
+		if content['campus'] not in ["all"]:
+			collection = db[content['campus']]
+			ret = []
+			for c in collection.find({},{'_id': False}):
+				ret.append(c)
+		else:
+			ret=[]
+			for cp in ["alameda", "taguspark", "nuclear"]:
+				collection = db[cp]
+				for c in collection.find({},{'_id':False}):
+					ret.append(c)
 		return json.dumps(str(ret))
 
 @app.route('/API/Admin/GetListAllUsersLogged', methods=['POST'])
 def ListUsersLogged():
 		#  Ver sessions e perguntar aos outros servidores por users em sessions também.
-	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
+	return json.dumps(str(UsersOn))
 
 
 @app.route('/API/Admin/GetListAllUsersInBuild', methods=['POST'])
@@ -225,14 +228,6 @@ def addLog():
 
 
 #  User API
-"""@app.route('/API/User/init', methods=['POST'])
-def redirectURLforuser():
-	#para receber o token do user (ainda nao funciona)
-	config = fenixedu.FenixEduConfiguration('1977390058176578', 'http://127.0.0.1:5002/User/Mainpage', 'XUwJJfct3cBy7jBbS+NOQVqrQ1eQGN1F9kYAWI3MCMpxgG/J4+h3Qv9+GmOS0Fs+F+Aml8kkZVXroJIb8SZyRw==', 'https://fenix.tecnico.ulisboa.pt/')
-	client = fenixedu.FenixEduClient(config)
-	url = client.get_authentication_url()
-	return jsonify({'url': url})"""
-
 
 @app.route('/API/User/Tokencode', methods=['POST'])
 def getUtoken():
@@ -248,24 +243,24 @@ def getUtoken():
 @app.route('/API/User/PostmyLocation', methods=['POST'])
 def PostmyLocal():
 	#User envia localizaçao e nome e atualiza. Isto depois deve atualizar na BD
-	collection = db.logs
-	content = request.get_json()
-	print(content)
-	print(content["name"])
-	location=[content["location"][0], content["location"][1]]
-	building,campus = getBuilding(int(content["location"][0]), int(content["location"][1]))
-	obj = {"type": "move", "user": content["name"], "date": datetime.datetime.now()}
-	for i, value in UsersOn.items():
-		if value['name']==str(content["name"]):
-			if value['Location'] != location:
-				value['Location']=[content["location"][0],content["location"][1]]
-				value['Building'],value['Campus']=building,campus
-				print(value['Building'], value['Campus'])
-				obj['Location']=value['Location']
-				obj['Building']=value['Building']
-				obj['Campus']=value['Campus']
-				collection.insert_one(obj)
-				return jsonify( [{"result": "Logs updated"}] )
+	# collection = db.logs
+	# content = request.get_json()
+	# print(content)
+	# print(content["name"])
+	# location=[content["location"][0], content["location"][1]]
+	# building,campus = getBuilding(int(content["location"][0]), int(content["location"][1]))
+	# obj = {"type": "move", "user": content["name"], "date": datetime.datetime.now()}
+	# for i, value in UsersOn.items():
+	# 	if value['name']==str(content["name"]):
+	# 		if value['Location'] != location:
+	# 			value['Location']=[content["location"][0],content["location"][1]]
+	# 			value['Building'],value['Campus']=building,campus
+	# 			print(value['Building'], value['Campus'])
+	# 			obj['Location']=value['Location']
+	# 			obj['Building']=value['Building']
+	# 			obj['Campus']=value['Campus']
+	# 			collection.insert_one(obj)
+	# 			return jsonify( [{"result": "Logs updated"}] )
 	return jsonify( [{"result": "Same Location"}] )
 
 @app.route('/API/User/SendBroadMsg/<idName>', methods=['POST'])
@@ -328,14 +323,14 @@ def getBuilding(lat, long):
 	else:
 		campus="alameda"
 	collection = db[campus]
-	min_range = 31.0
+	min_range = 30.01
 	building = ""
 	for c in collection.find():
 		d = calculateDistance(c['latitude'], c['longitude'], lat, long)
 		if d < min_range:
 			min_range = d
 			building = c['building']
-	if min_range == 31:
+	if min_range == 30.01:
 		return None, None
 	else:
 		return building, campus

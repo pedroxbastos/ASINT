@@ -25,6 +25,7 @@ class move_log:
         self.user = user
         self.building_id = building_id
         self.campus = campus
+        self.range = 30
 
     def __str__(self):
         return "LogType: Move. User %s - Checkin: %s, Checkout %s; Building %s, Campus %s" % (self.user, self.date, self.checkout, self.building_id, self.campus)

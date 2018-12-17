@@ -4,6 +4,7 @@ import json
 import building
 import datetime
 from Logs import message_log, move_log
+import os.path
 
 class AdminUI:
     def auth(self):
@@ -29,9 +30,11 @@ class AdminUI:
                       "2-ListLogged -List users logged in\n"
                       "3-ListInside -List users inside a building\n"
                       "4-UserHist - History of a user\n"
-                      "5-listbuildings - List available buildings\n"
+                      "5-BuildingHist - History on a given buildin\n"
+                      "6-listbuildings - List available buildings\n"
                       "6-AddBot - add a messaging bot\n"
-                      "7-quit\n")
+                      "8-quit\n"
+                      "9-insert - dummy logs insertion\n")
             l = l.split()
             if len(l) == 1:
                 command = l[0].upper()
@@ -60,13 +63,16 @@ class AdminUI:
                     else:
                         buildingID = input("Which building ID?")
                         self.listInside(buildingID, campus)
-
                 elif command == 'USERHIST':
                     userID = input("What is the userID? ")
                     if userID[:3] != "ist":
                         print("Wrong input")
                     else:
                         self.getHistory(userID)
+                elif command == "BUILDINGHIST":
+                    campus = input("What campus?")
+                    buildingID = input("What is the building ID?")
+                    self.getBHistory(campus,buildingID)
 
 
     def insertBuildings(self):
@@ -77,35 +83,47 @@ class AdminUI:
         else:
             #  Request file with buildings in the specified format
             path = input('File (in JSON format) path: ')
-            f = open(path, "r")
-            data = json.load(f)
-            campus = {"campus": campus_[0]}
-            spaces = data['containedSpaces']
-            f_spaces = []
-            f_spaces.append(campus)
-            i = 0
-            while i < len(spaces):
-                b = building.building(data['name'], spaces[i]['id'], spaces[i]['name'], spaces[i]['latitude'],
-                                      spaces[i]['longitude'])
-                f_spaces.append(b.toDict())
-                i = i + 1
-            payload = json.dumps(f_spaces)
-            r = requests.post("http://127.0.0.1:5000/API/Admin/GetBuildsLocations", json=payload)
-            print(r.status_code)
-            data = r.json()
-            print(data)
-            return
+            try:
+                f = open(path, "r")
+                data = json.load(f)
+                campus = {"campus": campus_[0]}
+                spaces = data['containedSpaces']
+                f_spaces = []
+                f_spaces.append(campus)
+                i = 0
+                while i < len(spaces):
+                    b = building.building(data['name'], spaces[i]['id'], spaces[i]['name'], spaces[i]['latitude'],
+                                          spaces[i]['longitude'])
+                    f_spaces.append(b.toDict())
+                    i = i + 1
+                payload = json.dumps(f_spaces)
+                r = requests.post("http://127.0.0.1:5000/API/Admin/GetBuildsLocations", json=payload)
+                print(r.status_code)
+                data = r.json()
+                print(data)
+            except IOError:
+                print("Error opening the file. Check if it exists or the path is correct.")
+            except KeyError as e:
+                print(e)
+                print("Wrong format for the information in the file.")
+            except json.decoder.JSONDecodeError as je:
+                print(je)
+                print("Error in the json format.")
+        return
 
     def getBuildings(self, campus):
         payload = {"campus": campus}
         r = requests.post("http://127.0.0.1:5000/API/Admin/GetBuildingList", json=payload)
         data = r.json()
-        print(type(data))
-        print(data.replace("'","\""))
         new = json.loads(data.replace("'","\""))
-        print(type(new))
-        for i in new:
-            print(i)
+        if new == []:
+            if campus != "all":
+                print("No buildings in %s yet." % campus)
+            else:
+                print("No building in any campus yet.")
+        else:
+            for i in new:
+                print(i)
         return
 
     def listInside(self, buildingID, campus):
@@ -140,8 +158,15 @@ class AdminUI:
         return
 
     def listLogged(self):
-        r = requests.post("http://127.0.0.1:5000/API/Admin/")
-        print("TODO")
+        r = requests.post("http://127.0.0.1:5000/API/Admin/GetListAllUsersLogged")
+        data = r.json()
+        data2=json.loads(data.replace("'","\""))
+        if data2 == []:
+            print("No users logged in at the moment.")
+        else:
+            print("Users logged in: ")
+            for i in data2:
+                print(i)
         return
 
     def insertBot(self):
@@ -167,4 +192,7 @@ class AdminUI:
         print(r.status_code)
         return
 
+    def getBHistory(self, campus, BuildingID):
+        print("%s %s " % (campus, BuildingID))
+        return
 
