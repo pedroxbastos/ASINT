@@ -99,7 +99,6 @@ def main_user():
 		UsersOn.append({'name':r2.json()['name'], "istid": r2.json()['username']})
 		print("USERSON: ")
 		print(UsersOn)
-
 	# UsersOn[onID-1]['access_token']=access_token
 	# UsersOn[onID-1]['refresh_token']=refresh_token
 	# UsersOn[onID-1]['Location']=None
@@ -307,6 +306,16 @@ def RecvMsg(idUser):
 	return jsonify(data)
 
 # Bots API
+
+@app.route('/API/Bot/SendBroadMsg/<idBot>', methods=['POST'])
+def BotMsgHandle(idBot):
+	collection = db.logs
+	content = request.get_json()
+	for obj, value in UsersOn.items():
+		print(value)
+		if value['Building'] == str(idBot):
+			Messages[value['name']].append(content["Message"])
+	return jsonify(data)
 
 # Other Servers API
 # Vai ser preciso para quando uns users estão logged num server e outros noutros e é preciso procurar todos.
