@@ -351,7 +351,7 @@ def DefineRange(idName):
 	print(content['Range'])
 	collection = db["logs"]
 	collection.update_one({"type" : "move", "user": session['username'], "checkout":"0"},
-						  {"range":content['Range']})
+						  {"$set":{"range":content['Range']}})
 	return jsonify({"ok":"ok"})
 	# for key,value in UsersOn.items():
 	# 	if idName == value['name']:

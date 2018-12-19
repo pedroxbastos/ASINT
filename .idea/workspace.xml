@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0b03562f-0754-4dd6-95ba-81c9c0b56f72" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Bot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Logs.py" beforeDir="false" afterPath="$PROJECT_DIR$/Logs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fenixedu.ini" beforeDir="false" afterPath="$PROJECT_DIR$/fenixedu.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Usertemplate.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Usertemplate.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/siteinit.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/siteinit.xhtml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,15 +41,14 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="215">
-                  <caret line="387" lean-forward="true" selection-start-line="387" selection-end-line="387" />
+                <state relative-caret-position="78">
+                  <caret line="353" column="48" selection-start-line="353" selection-start-column="48" selection-end-line="353" selection-end-column="48" />
                   <folding>
                     <element signature="e#0#32#0" expanded="true" />
                     <element signature="e#3391#3932#0" />
                     <element signature="e#4014#4245#0" />
                     <element signature="e#4564#5194#0" />
                     <element signature="e#8044#8729#0" />
-                    <element signature="e#8865#9113#0" />
                     <element signature="e#9115#9150#0" />
                     <element signature="e#9460#9614#0" />
                   </folding>
@@ -404,15 +397,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="215">
-          <caret line="387" lean-forward="true" selection-start-line="387" selection-end-line="387" />
+        <state relative-caret-position="78">
+          <caret line="353" column="48" selection-start-line="353" selection-start-column="48" selection-end-line="353" selection-end-column="48" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
             <element signature="e#3391#3932#0" />
             <element signature="e#4014#4245#0" />
             <element signature="e#4564#5194#0" />
             <element signature="e#8044#8729#0" />
-            <element signature="e#8865#9113#0" />
             <element signature="e#9115#9150#0" />
             <element signature="e#9460#9614#0" />
           </folding>
