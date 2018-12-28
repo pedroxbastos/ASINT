@@ -1,48 +1,65 @@
 from flask import Flask, url_for
 from flask import jsonify, redirect
 from flask import request, render_template
-from flask import session, flash
+from flask import session, flash, abort
 from pymongo import MongoClient, errors
 import pprint
 import json
 import fenixedu
+from fenixedu import user
 import requests
 from math import radians, cos, sin, asin, sqrt
 import datetime
 from functools import wraps
-
+import os
+from Logs import move_log, message_log
 
 
 Messages = {}
 UsersOn = []
 onID = 0
-
+#session.clear()
 #logs = {}
 
 #def addLog(name,Location):
 #	logs.update({name:Location})
 
 app = Flask(__name__)
-app.secret_key = b'_5#y2L"F4Qaz\n\xec]/'
-client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
-db = client['asint']
-"""class user:
-	def __init__(self, name):
-		self.name=name
-"""
+app.secret_key = os.urandom(32)
+db_client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
+db = db_client['asint']
 
-"""
-newuser = user(None)
-urltrue = None"""
+
+@app.errorhandler(404)
+def page_not_found(error):
+	return "Resource not found", 404
+
+@app.errorhandler(400)
+def bad_request(error):
+	return("Bad!", 400)
+
+@app.errorhandler(500)
+def res_not_found(error):
+	return "Resource not found 500", 500
+
+@app.after_request
+def after_request(response):
+	#response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+	return response
+
+
 @app.route('/')
 def hello_world():
+	if session:
+		print("ha sessão.")
+		print(session['username'])
+		print(session['name'])
+		print(session['logged_in'])
+		print(UsersOn)
+	else:
+		print("no session")
+		print(UsersOn)
 	return render_template("siteinit.xhtml") 
-
-#config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5000/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
-config = fenixedu.FenixEduConfiguration('851490151333943', 'http://127.0.0.1:5000/User/Mainpage', 'pod5dif2wxgTGshS3fxEsp5zY2pfsukCfeUH0pnHv20ye58x1ZflOuaDTx9OxPQlNz8VyfTjdddPyz/RBgTlpw==', 'https://fenix.tecnico.ulisboa.pt/')
-client = fenixedu.FenixEduClient(config)
-url = client.get_authentication_url()
-
 
 def login_required(f):
 	@wraps(f)
@@ -50,55 +67,64 @@ def login_required(f):
 		if 'logged_in' in session:
 			return f(*args, **kwargs)
 		else:
+			flash("No logged in user yet.")
 			return render_template("siteinit.xhtml")
 	return wrap
 
 @app.route('/User/Login')
 def login_fenix():
-	# global onID
-	# UsersOn[onID] = {"name":str(request.args["LoginId"])}
-	# print(UsersOn)
-	# onID += 1
+	#  Fenix
+	config = fenixedu.FenixEduConfiguration.fromConfigFile('fenixedu.ini')
+	client = fenixedu.FenixEduClient(config)
+	url = client.get_authentication_url()
 	return redirect(url, code=302)
 
 @app.route("/User/Logout", methods = ["POST"])
 @login_required
 def logout():
 	i=0
-	while i < len(UsersOn):
-		if UsersOn[i]['istid'] == session['username']:
-			break
-		i = i+1
+	print(UsersOn)
+	print(session)
 	UsersOn.pop(i)
+	print(UsersOn)
+	collection = db['logs']
+	collection.update_one({"type": "move", "checkout": "0", "user": session['username']}, {"$set":
+			{"checkout": str(datetime.datetime.now())}})
+	session.pop('logged_in', None)
+	session.pop('name', None)
+	session.pop('username', None)
 	session.clear()
+	print(session)
+
+	print("Logout Done")
 	return redirect(url_for('hello_world'))
 
 
 @app.route('/User/Mainpage', methods = ['POST', 'GET'])
 def main_user():
-	global onID
-	print("mainpage!")
-	if request.method == 'GET':
-		code = request.args.get('code')
-		print(code)
-		if code is None:
-			flash("There was an error. Try again.")
-			return redirect((url_for('hello_world')))
-	elif request.method == 'POST':
-		print("post")
-	if not session:
-		auth_url="https://fenix.tecnico.ulisboa.pt/oauth/access_token?client_id="+ config.client_id + "&client_secret="+config.client_secret +"&redirect_uri="+ config.redirect_uri +"&code=" + code + "&grant_type=authorization_code"
-		r = requests.post(auth_url)
-		t = r.json()
-		access_token = t['access_token']
-		refresh_token = t['refresh_token']
-		r2 = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params={"access_token":access_token})
-		session['username'] = r2.json()['username']
-		session['name'] = r2.json()['name']
-		session['logged_in'] = True
-		UsersOn.append({'name':r2.json()['name'], "istid": r2.json()['username']})
-		print("USERSON: ")
-		print(UsersOn)
+	#  Needed again
+	config = fenixedu.FenixEduConfiguration.fromConfigFile('fenixedu.ini')
+	client = fenixedu.FenixEduClient(config)
+	try:
+		code = request.args['code']
+	except KeyError:
+		abort(400)
+
+	user_ = client.get_user_by_code(code)
+	person = client.get_person(user_)
+	displayName = person['displayName']
+	username = person['username']
+	UsersOn.append({"username" : username, "name": displayName, "user":user_})
+	print(username)
+	print(displayName)
+	session['code'] = code
+	session['username'] = username
+	session['name'] = displayName
+	session['logged_in'] = True
+	print(user_.access_token)
+	print(user_.refresh_token)
+	print(user_.token_expires)
+
 	# UsersOn[onID-1]['access_token']=access_token
 	# UsersOn[onID-1]['refresh_token']=refresh_token
 	# UsersOn[onID-1]['Location']=None
@@ -106,21 +132,25 @@ def main_user():
 	# UsersOn[onID-1]['Campus']=None
 	# UsersOn[onID-1]['Range']=100 #default
 	# Messages[UsersOn[onID-1]['name']] = []
+	return redirect(url_for('MainpageDone'))
 
-	return render_template("Usertemplate.xhtml", LoginId = session['name'])
+@app.route('/User/MainpageDone', methods=['GET'])
+@login_required
+def MainpageDone():
+	return render_template("Usertemplate.xhtml")
 
 @app.route('/User/getToken', methods=['POST'])
 def getToken():
 	test = request.json
 	#print(test['code'])
 	#print("endtest")
-	content = request.get_json()
+	#content = request.get_json()
 	#print(str(content))
 	#print(str(content["code"]))
 	#print(str(content["code"]).split('=')[1])
 	#url = "http://127.0.0.1:5000/API/User/Tokencode"
-	user = client.get_user_by_code(str(content["code"]).split('=')[1])
-	person = client.get_person(user)
+	#user = client.get_user_by_code(str(content["code"]).split('=')[1])
+	#person = client.get_person(user)
 	#print(person)
 	#r = r.json()
 	#print(data)
@@ -228,29 +258,60 @@ def addLog():
 
 #  User API
 
-@app.route('/API/User/Tokencode', methods=['POST'])
-def getUtoken():
-	config = fenixedu.FenixEduConfiguration('1695915081465925', 'http://127.0.0.1:5000/User/Mainpage', 'd/USUpUYU7o20hWNwEi+S3PWW5Cc4ypiQrX3rUfxLAcFat0epdCuxjS35iIWNwJ4ruCu9D7bL2GXZc9P4RDNvQ==', 'https://fenix.tecnico.ulisboa.pt/')
-	client_ = fenixedu.FenixEduClient(config)
-	content = request.get_json()
-	user = client.get_user_by_code(str(content["code"]).split('=')[1])
-	person = client_.get_person(user)
-	return jsonify( [{"result": "Token successfull"}] )
-
 
 
 @app.route('/API/User/PostmyLocation', methods=['POST'])
 def PostmyLocal():
 	#User envia localizaçao e nome e atualiza. Isto depois deve atualizar na BD
-	# collection = db.logs
-	# content = request.get_json()
+	content = request.json
+	building, campus, building_id = getBuilding(content["location"][0], content["location"][1])
+	print(building)
+	print(campus)
+	print(building_id)
+	if building is None:
+		#  No buildin exists for this coordinates
+		return jsonify( [{"result": "Log not inserted - There's no building in this coordinates"}] )
+	else:
+		collection = db["logs"]
+		if collection.count_documents({"type":"move", "checkout":"0", "user": session['username']}) == 0:
+			#  New log insertion
+			collection.insert_one(
+				move_log(str(datetime.datetime.now()), "0", session['username'], building_id, campus,
+						 content["location"][0], content["location"][1]).toDict())
+			return jsonify([{"result": "New log was inserted for this location (checkin)"}])
+		else:
+			#  Checkin already done, so update the document if the location changed. else do nothing.
+			c = collection.find_one({"type":"move", "checkout":"0", "user": session['username']})
+			print(c)
+			if c['building'] != building_id:
+				#  Building change. Checkout of old building and checking on the new one.
+				collection.update_one({"type":"move", "checkout":"0", "user": session['username']},{"$set":
+				{"checkout":str(datetime.datetime.now())}})
+				collection.insert_one(
+					move_log(str(datetime.datetime.now()), "0", session['username'], building_id, campus,
+							 content["location"][0], content["location"][1]).toDict())
+				return jsonify([{"result": "Location was updated"}])
+			else:
+				#  Same building, update location only
+				collection.update_one({"type": "move", "checkout": "0", "user": session['username']},
+									  {"$set": {"location":{"latitude": content["location"][0], "longitude" : content["location"][1]}}})
+				return jsonify([{"result": "Same Location"}])
+
+
+	# if getBuilding(content["location"][0], content["location"][1]) == {}
+	# 	#  Building não existe na BD.
+	# 	return jsonify([{"result": "The given coordinates do not correspond to a stored building"}])
+	# if collection.count_documents({"type":"move", })
+	#test = session['username'] + "lat -> " + str(content["location"][0]) + "long ->" + str(content["location"][0])
+	#print(test)
+
 	# print(content)
 	# print(content["name"])
 	# location=[content["location"][0], content["location"][1]]
 	# building,campus = getBuilding(int(content["location"][0]), int(content["location"][1]))
 	# obj = {"type": "move", "user": content["name"], "date": datetime.datetime.now()}
 	# for i, value in UsersOn.items():
-	# 	if value['name']==str(content["name"]):
+	# 	if value['naforme']==str(content["name"]):
 	# 		if value['Location'] != location:
 	# 			value['Location']=[content["location"][0],content["location"][1]]
 	# 			value['Building'],value['Campus']=building,campus
@@ -260,7 +321,7 @@ def PostmyLocal():
 	# 			obj['Campus']=value['Campus']
 	# 			collection.insert_one(obj)
 	# 			return jsonify( [{"result": "Logs updated"}] )
-	return jsonify( [{"result": "Same Location"}] )
+	#return jsonify( [{"result": "Same Location"}] )
 
 @app.route('/API/User/SendBroadMsg/<idName>', methods=['POST'])
 def SendMsg(idName):
@@ -286,14 +347,20 @@ def SendMsg(idName):
 @app.route('/API/User/DefineRange/<idName>', methods=['POST'])
 def DefineRange(idName):
 	content = request.get_json()
-	for key,value in UsersOn.items():
-		if idName == value['name']:
-			objself=key
-			print(objself)
-		break
-	UsersOn[objself]['Range']=int(content["Range"])
-	print("range:"+str(UsersOn[objself]['Range']))
-	return jsonify( {"Result":"Range updated" })
+	print(session['username'])
+	print(content['Range'])
+	collection = db["logs"]
+	collection.update_one({"type" : "move", "user": session['username'], "checkout":"0"},
+						  {"$set":{"range":content['Range']}})
+	return jsonify({"ok":"ok"})
+	# for key,value in UsersOn.items():
+	# 	if idName == value['name']:
+	# 		objself=key
+	# 		print(objself)
+	# 	break
+	# UsersOn[objself]['Range']=int(content["Range"])
+	# print("range:"+str(UsersOn[objself]['Range']))
+	# return jsonify( {"Result":"Range updated" })
 
 @app.route('/API/User/RecvMsg/<idUser>', methods=['GET'])
 def RecvMsg(idUser):
@@ -304,6 +371,7 @@ def RecvMsg(idUser):
 			data[key] = values
 			Messages[key] = []
 	return jsonify(data)
+
 
 # Bots API
 
@@ -322,8 +390,14 @@ def BotMsgHandle(idBot):
 
 #Outros
 
-
+@app.route('/GetBuilding/<lat>/<long>')
 def getBuilding(lat, long):
+	print(request.method)
+	if type(lat) != float:
+		lat = float(lat)
+	if type(long) != float:
+		long = float(long)
+
 	#  Given the user's coordinates, returns the building where the user is
 	if lat >38.8:
 		campus="nuclear"
@@ -335,15 +409,22 @@ def getBuilding(lat, long):
 	min_range = 30.01
 	building = ""
 	for c in collection.find():
-		d = calculateDistance(c['latitude'], c['longitude'], lat, long)
+		d = calculateDistance(float(c['latitude']), float(c['longitude']), lat, long)
+		print("b : %s, d= %f -- min range: %f" % (c['name'], d, min_range))
 		if d < min_range:
 			min_range = d
-			building = c['building']
+			building = c['name']
+			building_id = c['id']
 	if min_range == 30.01:
-		return None, None
+		if request.method == "GET":
+			return jsonify({"building" : None, "campus": None})
+		else:
+			return None, None, None
 	else:
-		return building, campus
-
+		if request.method == "GET":
+			return jsonify({"building":building, "campus":campus})
+		else:
+			return building, campus, building_id
 
 def calculateDistance(b_lat, b_long, u_lat, u_long):
 	#  haversine formula. Returns the distance between 2 coordinate points in meters
@@ -354,8 +435,6 @@ def calculateDistance(b_lat, b_long, u_lat, u_long):
 	c = 2 * asin(sqrt(a))
 	r = 6371 * 1000  # Radius of earth in meters.
 	return c*r
-
-
 
 if __name__ == '__main__':
 	app.run()

@@ -19,20 +19,24 @@
 
 <div class="background" id="authenticate">{{session.username}}</div>
 <div class="background" id="name">{{session.name}}</div>
-<div class="background" id="locationspot">(Location will be here)</div>
-<div class="background" id="b_infor">TODO building atm</div>
+<div class="background" id="locationspot">Getting coordinates...</div>
+<div class="background" id="curr_building">Getting building...</div>
 <div class="background" id="serverresp">(Server response)</div>
+<div class="background" id="range">Current Range is 30m.</div>
+<div class="background" id="in_build">TODO: users in the same building.</div>
+<div class="background" id="in_range">TODO: users in the messaging range.</div>
+
 <h2>Commands</h2>
 <input type="text" name="" size="20" id="Range" />
-<input type="submit" value="New Range"  id="DefineRange"/>
+<input type="submit" value="New Range"  id="DefineRange"> Default value for range is 30m (i.e: the building you are in)</input>
 <p></p>
 <input type="text" name="" size="20" id="Messagetosend" />
 <input type="submit" value="Send"  id="Sendbutton"/>
 <p></p>
 <button type="button" id="Recvbutton">Receive Messages</button>
 <div id="fieldMsg">(Messages will be here)</div>
-<form action = "/User/Logout" method = 'post'>
-   <button type ="submit" id="Logout" value="Logout">Logout</button>
+<form action ="/User/Logout" id="LogoutForm"  method = 'post'>
+   <button type ="submit" id="ButtonLogout" value="Logout">Logout</button>
 </form>
 
 
@@ -42,20 +46,40 @@
  //<![CDATA[
 
     geoLocal();
-    var periodiclocal = setInterval(geoLocal,5000);
+    var periodiclocal = setInterval(geoLocal,60000);
     var x = document.getElementById("locationspot");
     function geoLocal() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
             navigator.geolocation.getCurrentPosition(postLocation);
+            navigator.geolocation.getCurrentPosition(getCurrBuilding);
         } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
         }
-    } 
-    function showPosition(position) {
-        x.innerHTML = "Latitude: " + position.coords.latitude + 
-        "<br>Longitude: " + position.coords.longitude; 
     }
+    function showPosition(position) {
+        x.innerHTML = "Latitude: " + position.coords.latitude +
+        "<br>Longitude: " + position.coords.longitude;
+    }
+    function getCurrBuilding(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+        $.ajax({
+            url:"/GetBuilding/" + lat +"/" + lon,
+            success : function( response) {
+                if (response['building'] != null){
+                    $("#curr_building").text("You are currently in " + response['building'] + " in campus "+ response['campus']);
+                }
+                if (response['building'] == null){
+                    $("#curr_building").text("You are currently not in one of the available buildings");
+                }
+            },
+            error : function(){
+                $("#curr_building").text("Getting your building...");
+            }
+        });
+    }
+
     function postLocation(position){
         var lat = position.coords.latitude;
         var lon = position.coords.longitude;
@@ -89,9 +113,16 @@
                 }
             });
         });
-    });
 
-    $( document ).ready(function() {
+        $( "#LogoutForm" ).submit(function ( event ) {
+            $.ajax({
+                type: "GET",
+                dataType : "jsonp",
+                url: "https://fenix.tecnico.ulisboa.pt/logout",
+            });
+            alert("You have been logged out!");
+        });
+
         $( "#Recvbutton" ).click(function( event ) {
             var authname = document.getElementById("authenticate").innerHTML;
             console.log("click");
@@ -102,30 +133,29 @@
                 contentType: "application/json",
                 success: function (data) {
                     console.log(data);
-                        s = "<ol>";
-                        //for (var i = 0, len = data.length; i < len; i++) {
-                        //    s += "<li>";
-                        //    s += data[i];
-                        //    s += "</li>";
-                        //}
-                        s="Messages Received:"
-                        for (var key in data) {
-                            if (data.hasOwnProperty(key)) {
-                                console.log(key + " -> " + data[key]);
-                                for (var i = 0, len = data[key].length; i < len; i++) {
+                    s = "<ol>";
+                    //for (var i = 0, len = data.length; i < len; i++) {
+                    //    s += "<li>";
+                    //    s += data[i];
+                    //    s += "</li>";
+                    //}
+                    s="Messages Received:"
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            console.log(key + " -> " + data[key]);
+                            for (var i = 0, len = data[key].length; i < len; i++) {
                                 s += "<li>";
                                 s += data[key][i]
-                                s += "</li>";   
-                                }                            
+                                s += "</li>";
+                            }
                         }
-                        }
-                        s += "</ol>";
-                        $("#fieldMsg").html(s);
+                    }
+                    s += "</ol>";
+                    $("#fieldMsg").html(s);
                 }
+            });
         });
-    });
-    });
-        $( document ).ready(function() {
+
         $( "#DefineRange" ).click(function( event ) {
             var authname = document.getElementById("authenticate").innerHTML;
             console.log("click");
@@ -136,12 +166,14 @@
                 contentType: "application/json",
                 data: '{"name":"' + authname + '","Range":"' + $("#Range").val() + '"}',
                 success: function (data) {
-                    console.log(data);
+                    $("#range").text("Current Range is "+$("#Range").val() +"m.");
+                },
+                error: function(xhr){
+                    console.log(xhr);
                 }
             });
         });
     });
-
  //]]>
 </script>
 </body>

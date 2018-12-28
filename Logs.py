@@ -19,11 +19,12 @@ class message_log:
 
 class move_log:
 
-    def __init__(self, checkin, checkout, user, building_id, campus):
+    def __init__(self, checkin, checkout, user, building_id, campus, latitude, longitude):
         self.date = checkin
         self.checkout = checkout
         self.user = user
         self.building_id = building_id
+        self.location = {"latitude": latitude, "longitude" : longitude}
         self.campus = campus
         self.range = 30
 
@@ -31,4 +32,5 @@ class move_log:
         return "LogType: Move. User %s - Checkin: %s, Checkout %s; Building %s, Campus %s" % (self.user, self.date, self.checkout, self.building_id, self.campus)
 
     def toDict(self):
-        return {"type" : "move", "user" : self.user, "checkin" : self.checkin, "checkout" : self.checkout, "building" : self.building_id, "campus" : self.campus}
+        return {"type" : "move", "user" : self.user, "checkin" : self.date, "checkout" : self.checkout,
+                "location": self.location, "building" : self.building_id, "campus" : self.campus}
