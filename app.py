@@ -103,6 +103,7 @@ def logout():
 @app.route('/User/Mainpage', methods = ['POST', 'GET'])
 def main_user():
 	#  Needed again
+	global onID
 	config = fenixedu.FenixEduConfiguration.fromConfigFile('fenixedu.ini')
 	client = fenixedu.FenixEduClient(config)
 	try:
@@ -115,6 +116,8 @@ def main_user():
 	displayName = person['displayName']
 	username = person['username']
 	UsersOn.append({"username" : username, "name": displayName, "user":user_})
+	Messages[username] = []
+	
 	print(username)
 	print(displayName)
 	session['code'] = code
@@ -125,13 +128,14 @@ def main_user():
 	print(user_.refresh_token)
 	print(user_.token_expires)
 
-	# UsersOn[onID-1]['access_token']=access_token
-	# UsersOn[onID-1]['refresh_token']=refresh_token
-	# UsersOn[onID-1]['Location']=None
-	# UsersOn[onID-1]['Building']=None
-	# UsersOn[onID-1]['Campus']=None
-	# UsersOn[onID-1]['Range']=100 #default
-	# Messages[UsersOn[onID-1]['name']] = []
+	#UsersOn[onID]['access_token']=access_token
+	#UsersOn[onID]['refresh_token']=refresh_token
+	#UsersOn[onID]['Location']=None
+	#UsersOn[onID]['Building']=None
+	#UsersOn[onID]['Campus']=None
+	#UsersOn[onID]['Range']=100 #default
+	
+	#onID = onID+1
 	return redirect(url_for('MainpageDone'))
 
 @app.route('/User/MainpageDone', methods=['GET'])
@@ -328,12 +332,13 @@ def SendMsg(idName):
 	collection = db.logs
 	content = request.get_json()
 	objself=None
-	for key,value in UsersOn.items():
-		if idName == value['name']:
+	print(UsersOn)
+	for key in UsersOn:
+		if key["username"] == value['name']:
 			objself=key
 			print(objself)
 		break
-	for obj, value in UsersOn.items():
+	for obj in UsersOn:
 		if obj != objself:
 			print(value)
 			if calculateDistance(value['Location'][0], value['Location'][1], UsersOn[objself]['Location'][0], UsersOn[objself]['Location'][1]) < UsersOn[objself]['Range']:
@@ -379,10 +384,11 @@ def RecvMsg(idUser):
 def BotMsgHandle(idBot):
 	collection = db.logs
 	content = request.get_json()
-	for obj, value in UsersOn.items():
-		print(value)
-		if value['Building'] == str(idBot):
-			Messages[value['name']].append(content["Message"])
+	for obj in UsersOn:
+		#print(value)
+		#if value['Building'] == str(idBot):
+		print(Messages)
+		Messages[obj["username"]].append(content["content"])
 	return jsonify(data)
 
 # Other Servers API
@@ -406,7 +412,7 @@ def getBuilding(lat, long):
 	else:
 		campus="alameda"
 	collection = db[campus]
-	min_range = 30.01
+	min_range = 10000
 	building = ""
 	for c in collection.find():
 		d = calculateDistance(float(c['latitude']), float(c['longitude']), lat, long)
