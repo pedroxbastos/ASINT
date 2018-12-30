@@ -13,10 +13,16 @@ import datetime
 from functools import wraps
 import os
 from Logs import move_log, message_log
+import secrets
 
 
 Messages = {}
 UsersOn = []
+
+#Bots Online
+BotsOn = {}
+#Available tokens to init bots
+token_bot_queue = []
 onID = 0
 #session.clear()
 #logs = {}
@@ -258,6 +264,14 @@ def addLog():
 	c = collection.insert_one(content2)
 	return json.dumps("ok")
 
+@app.route('/API/Admin/Addbot', methods=['GET'])
+def addBot():
+	content=request.json
+	token = secrets.token_urlsafe(16)
+	#mensagem do admin {"addbot": ["campus","buildingID"]}
+	token_bot_queue.append(token)
+	BotsOn[token]=content["addbot"]
+	return jsonify({"token":token})
 
 
 #  User API
@@ -379,6 +393,17 @@ def RecvMsg(idUser):
 
 
 # Bots API
+@app.route('/API/Bot/init', methods=['GET'])
+def get_bot_token():
+	print(token_bot_queue)
+	if len(token_bot_queue)==0:
+		print("erro")
+		return jsonify({"error": "no tokens available"})
+	else:
+		print(token_bot_queue)
+		print(BotsOn)
+		return jsonify({"token": token_bot_queue.pop(0)})
+
 
 @app.route('/API/Bot/SendBroadMsg/<idBot>', methods=['POST'])
 def BotMsgHandle(idBot):

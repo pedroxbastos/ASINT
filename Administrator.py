@@ -5,8 +5,12 @@ import building
 import datetime
 from Logs import message_log, move_log
 import os.path
+from pymongo import MongoClient, errors
 
 class AdminUI:
+    def __init__(self):
+        self.token_bot_queue = []
+    """
     def auth(self):
         count = 0
         print("Administrator application.")
@@ -18,12 +22,12 @@ class AdminUI:
             else:
                 print("Wrong user/pass. %d attempts left." % (2 - count))
                 count = count + 1
-        return False
+        return False"""
 
     def menu(self):
         exit_ = False
-        #client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
-        #db = client.asint
+        db_client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
+        db = db_client['asint']
         while not exit_:
             print("Choose the function to be executed with its name:")
             l = input("\n1-blocal -Insert Building Location\n"
@@ -32,7 +36,7 @@ class AdminUI:
                       "4-UserHist - History of a user\n"
                       "5-BuildingHist - History on a given buildin\n"
                       "6-listbuildings - List available buildings\n"
-                      "6-AddBot - add a messaging bot\n"
+                      "7-AddBot - add a messaging bot\n"
                       "8-quit\n"
                       "9-insert - dummy logs insertion\n")
             l = l.split()
@@ -73,6 +77,12 @@ class AdminUI:
                     campus = input("What campus?")
                     buildingID = input("What is the building ID?")
                     self.getBHistory(campus,buildingID)
+                elif command == "ADDBOT":
+                    campus = input("What campus?")
+                    for obj in db[campus].find():
+                        print(str(obj["name"]), obj["id"])
+                    buildingID = input("What is the building ID?")
+                    self.insertBot(campus, buildingID)
 
 
     def insertBuildings(self):
@@ -169,8 +179,12 @@ class AdminUI:
                 print(i)
         return
 
-    def insertBot(self):
-        print("TODO")
+    def insertBot(self, campus, buildingID):
+        r = requests.get("http://127.0.0.1:5000/API/Admin/Addbot", json={"addbot": [campus, buildingID]})
+        data=r.json()
+        print(data)
+        self.token_bot_queue.append(str(data))
+        print(self.token_bot_queue)
         return
 
     def insertLog(self):
@@ -196,3 +210,6 @@ class AdminUI:
         print("%s %s " % (campus, BuildingID))
         return
 
+if __name__ == '__main__':
+    menu = AdminUI()
+    menu.menu()
