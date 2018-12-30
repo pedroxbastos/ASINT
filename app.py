@@ -121,7 +121,7 @@ def main_user():
 	person = client.get_person(user_)
 	displayName = person['displayName']
 	username = person['username']
-	UsersOn.append({"username" : username, "name": displayName, "user":user_})
+	UsersOn.append({"username" : username, "name": displayName, "user":user_, "range":0})
 	Messages[username] = []
 	
 	print(username)
@@ -308,6 +308,11 @@ def PostmyLocal():
 				collection.insert_one(
 					move_log(str(datetime.datetime.now()), "0", session['username'], building_id, campus,
 							 content["location"][0], content["location"][1]).toDict())
+				for i in UsersOn:
+					if i["username"]==session['username']:
+						i["location"]=[content["location"][0], content["location"][1]]
+						i["building"]=building_id
+						i["campus"]=campus
 				return jsonify([{"result": "Location was updated"}])
 			else:
 				#  Same building, update location only
@@ -346,20 +351,17 @@ def SendMsg(idName):
 	collection = db.logs
 	content = request.get_json()
 	objself=None
+	for obj in UsersOn:
+		if obj["username"]==session['username']:
+			objself=obj
 	print(UsersOn)
-	for key in UsersOn:
-		if key["username"] == value['name']:
-			objself=key
-			print(objself)
-		break
 	for obj in UsersOn:
 		if obj != objself:
-			print(value)
-			if calculateDistance(value['Location'][0], value['Location'][1], UsersOn[objself]['Location'][0], UsersOn[objself]['Location'][1]) < UsersOn[objself]['Range']:
-				Messages[value['name']].append(content["Message"])
+			if calculateDistance(obj['Location'][0], obj['Location'][1], objself['location'][0], objself['location'][1]) < objself['range']:
+				Messages[session["username"]].append(content["Message"])
 
 	print(Messages)
-	obj = {"type": "Message", "user": UsersOn[objself]['name'], "date": datetime.datetime.now(), "content":content["Message"]}
+	obj = {"type": "Message", "user": session["username"], "date": datetime.datetime.now(), "content":content["Message"]}
 	collection.insert_one(obj)
 	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
 
@@ -400,8 +402,6 @@ def get_bot_token():
 		print("erro")
 		return jsonify({"error": "no tokens available"})
 	else:
-		print(token_bot_queue)
-		print(BotsOn)
 		return jsonify({"token": token_bot_queue.pop(0)})
 
 
@@ -413,8 +413,9 @@ def BotMsgHandle(idBot):
 		#print(value)
 		#if value['Building'] == str(idBot):
 		print(Messages)
+		#if obj["campus"]==BotsOn[token][0] and obj["building"]==BotsOn[token][1]:
 		Messages[obj["username"]].append(content["content"])
-	return jsonify(data)
+	return jsonify({"Result": "OK"})
 
 # Other Servers API
 # Vai ser preciso para quando uns users estão logged num server e outros noutros e é preciso procurar todos.
