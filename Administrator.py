@@ -10,7 +10,7 @@ from pymongo import MongoClient, errors
 class AdminUI:
     def __init__(self):
         self.token_bot_queue = []
-    """
+
     def auth(self):
         count = 0
         print("Administrator application.")
@@ -22,14 +22,14 @@ class AdminUI:
             else:
                 print("Wrong user/pass. %d attempts left." % (2 - count))
                 count = count + 1
-        return False"""
+        return False
 
     def menu(self):
         exit_ = False
         db_client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
         db = db_client['asint']
         while not exit_:
-            print("Choose the function to be executed with its name:")
+            print("\n\nChoose the function to be executed with its name:")
             l = input("\n1-blocal -Insert Building Location\n"
                       "2-ListLogged -List users logged in\n"
                       "3-ListInside -List users inside a building\n"
@@ -75,8 +75,11 @@ class AdminUI:
                         self.getHistory(userID)
                 elif command == "BUILDINGHIST":
                     campus = input("What campus?")
-                    buildingID = input("What is the building ID?")
-                    self.getBHistory(campus,buildingID)
+                    if campus not in ["taguspark", "alameda", "nuclear"]:
+                        print("Wrong campus input.")
+                    else:
+                        buildingID = input("What is the building ID?")
+                        self.getBHistory(campus,buildingID)
                 elif command == "ADDBOT":
                     campus = input("What campus?")
                     for obj in db[campus].find():
@@ -154,11 +157,8 @@ class AdminUI:
         payload = {"userID": userID}
         r = requests.post("http://127.0.0.1:5000/API/Admin/GetListHistory", json=payload)
         data = r.json()
-        print(type(data))
-        print(data.replace("'", "\""))
         try:
             new = json.loads(data.replace("'", "\""))
-            print(type(new))
             if len(new) == 0:
                 print("vazia")
             for i in new:
@@ -207,7 +207,17 @@ class AdminUI:
         return
 
     def getBHistory(self, campus, BuildingID):
-        print("%s %s " % (campus, BuildingID))
+        payload = {"campus": campus, "buildingID": BuildingID }
+        r = requests.post("http://127.0.0.1:5000/API/Admin/GetListHistory", json=payload)
+        data = r.json()
+        try:
+            new = json.loads(data.replace("'", "\""))
+            if len(new) == 0:
+                print("vazia")
+            for i in new:
+                print(str(i))
+        except:
+            pass
         return
 
 if __name__ == '__main__':

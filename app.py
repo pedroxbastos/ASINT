@@ -130,6 +130,7 @@ def main_user():
 	session['username'] = username
 	session['name'] = displayName
 	session['logged_in'] = True
+	session['a_token'] = user_.access_token
 	print(user_.access_token)
 	print(user_.refresh_token)
 	print(user_.token_expires)
@@ -215,7 +216,7 @@ def BuildingList():
 
 @app.route('/API/Admin/GetListAllUsersLogged', methods=['POST'])
 def ListUsersLogged():
-		#  Ver sessions e perguntar aos outros servidores por users em sessions também.
+		#  Ver UsersOn e perguntar aos outros servidores por users em sessions também.
 	return json.dumps(str(UsersOn))
 
 
@@ -244,17 +245,29 @@ def ListUsersInsideB():
 def getUserHistory():
 	if request.method == "POST":
 		content = request.json
-		userID = content['userID']
-		print(userID)
-		collection = db["logs"]
-		if collection.count_documents({"userID" : userID}):
-			return json.dumps("The are no logs for user %s." % userID)
-		else:
-			ret = []
-			for c in collection.find({"$or":[ {"user":userID}, {"to":userID}, {"from_":userID}]}, {'_id':False}).sort('date',1):
-				print(c)
-				ret.append(c)
-			return json.dumps(str(ret))
+		if content.__len__() == 1:
+			#User history.
+			userID = content['userID']
+			collection = db["logs"]
+			if collection.count_documents({"userID" : userID}) == 0:
+				return json.dumps("The are no logs for user %s." % userID)
+			else:
+				ret = []
+				for c in collection.find({"$or":[ {"user":userID}, {"to":userID}, {"from_":userID}]}, {'_id':False}).sort('date',1):
+					ret.append(c)
+				return json.dumps(str(ret))
+		elif content.__len__() == 2:
+			#Buiding history
+			campus = content["campus"]
+			buildingID = content["buildingID"]
+			collection = db["logs"]
+			if collection.count_documents({"building": buildingID}) == 0:
+				return json.dumps("The are no logs for the building with ID %s in campus %s ." % (buildingID, campus))
+			else:
+				ret = []
+				for c in collection.find({"building": buildingID},{'_id':False}).sort('date',1):
+					ret.append(c)
+				return json.dumps(str(ret))
 
 @app.route('/API/insert', methods=['POST'])
 def addLog():
@@ -287,7 +300,7 @@ def PostmyLocal():
 	print(campus)
 	print(building_id)
 	if building is None:
-		#  No buildin exists for this coordinates
+		#  No building exists for this coordinates
 		return jsonify( [{"result": "Log not inserted - There's no building in this coordinates"}] )
 	else:
 		collection = db["logs"]
