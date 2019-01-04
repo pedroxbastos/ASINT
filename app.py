@@ -427,7 +427,6 @@ def getBuilding(lat, long):
 	in_building=[]
 	for c in collection.find():
 		d = calculateDistance(float(c['latitude']), float(c['longitude']), lat, long)
-		#print(d)
 		if d < min_range:
 			min_range = d
 			building = c['name']

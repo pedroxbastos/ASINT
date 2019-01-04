@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0b03562f-0754-4dd6-95ba-81c9c0b56f72" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/Usertemplate.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Usertemplate.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/siteinit.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/siteinit.xhtml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,7 +14,7 @@
     <favorites_list name="ASINT" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.49736246">
+    <splitter split-orientation="horizontal" split-proportion="0.43632254">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -44,8 +41,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="814">
-                  <caret line="285" lean-forward="true" selection-start-line="285" selection-end-line="285" />
+                <state relative-caret-position="324">
+                  <caret line="433" column="35" lean-forward="true" selection-start-line="433" selection-start-column="35" selection-end-line="433" selection-end-column="35" />
                   <folding>
                     <element signature="e#0#32#0" expanded="true" />
                     <element signature="e#1995#2511#0" />
@@ -442,8 +439,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="814">
-          <caret line="285" lean-forward="true" selection-start-line="285" selection-end-line="285" />
+        <state relative-caret-position="324">
+          <caret line="433" column="35" lean-forward="true" selection-start-line="433" selection-start-column="35" selection-end-line="433" selection-end-column="35" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
             <element signature="e#1995#2511#0" />
