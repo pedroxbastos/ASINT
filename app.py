@@ -38,15 +38,21 @@ db = db_client['asint']
 
 @app.errorhandler(404)
 def page_not_found(error):
-	return "Resource not found", 404
+	flash("You were returned to the initial page due to an error:"
+		  " 404 - Page Not Found")
+	return render_template("siteinit.xhtml")
 
 @app.errorhandler(400)
 def bad_request(error):
-	return("Bad!", 400)
+	flash("You were returned to the initial page due to an error:"
+		  " 400 - Bad Request")
+	return render_template("siteinit.xhtml")
 
 @app.errorhandler(500)
 def res_not_found(error):
-	return "Resource not found 500", 500
+	flash("You were returned to the initial page due to an error:"
+		  " 500 - Resource Not Found")
+	return render_template("siteinit.xhtml")
 
 @app.after_request
 def after_request(response):
@@ -56,7 +62,7 @@ def after_request(response):
 
 @app.route('/')
 def hello_world():
-	if session:
+	if session.get('username'):
 		print("ha sessão.")
 		print(session['username'])
 		print(session['name'])
@@ -89,20 +95,29 @@ def login_fenix():
 @login_required
 def logout():
 	i=0
-	print(UsersOn)
-	print(session)
-	UsersOn.pop(i)
-	print(UsersOn)
-	collection = db['logs']
-	collection.update_one({"type": "move", "checkout": "0", "user": session['username']}, {"$set":
-			{"checkout": str(datetime.datetime.now())}})
+	x=0
+	while session['username'] != UsersOn[i]['username']:
+		i +=1
+	if UsersOn[i]['count']==1:
+		#Caso logout normal.
+		UsersOn.pop(i)
+		collection = db['logs']
+		collection.update_one({"type": "move", "checkout": "0", "user": session['username']}, {"$set":
+								{"checkout": str(datetime.datetime.now())}})
+	else:
+		x = 1
+		UsersOn[i]['count'] -=1
+
 	session.pop('logged_in', None)
 	session.pop('name', None)
 	session.pop('username', None)
 	session.clear()
-	print(session)
-
-	print("Logout Done")
+	if x==0:
+		flash("You have been logged out!")
+	else:
+		flash("You have been logged out from this device"
+			  " because you entered the application on a different"
+			  " device.")
 	return redirect(url_for('hello_world'))
 
 
@@ -117,63 +132,43 @@ def main_user():
 	except KeyError:
 		abort(400)
 
+	print("Vou fazer print dos userson")
+	print(UsersOn)
+
 	user_ = client.get_user_by_code(code)
 	person = client.get_person(user_)
 	displayName = person['displayName']
 	username = person['username']
-	UsersOn.append({"username" : username, "name": displayName, "user":user_, "range":0})
-	Messages[username] = []
-	
-	print(username)
-	print(displayName)
+
+	i= find_index(UsersOn, 'username', username)
+	if i == -1:
+		UsersOn.append({"username" : username, "name": displayName, "user":user_, "range":0, "a_token": user_.access_token, "count":1,
+						"building":None, "campus": None, "location":None})
+		Messages[username] = []
+	else:
+		# Primeiro fazer o checkout da sessão que estava activa
+		collection = db['logs']
+		collection.update_one({"type": "move", "checkout": "0", "user": username}, {"$set":
+							   {"checkout": str(datetime.datetime.now())}})
+		# Atualizar o user no UsersOn
+		UsersOn[i]['user'] = user_
+		UsersOn[i]['a_token'] = user_.access_token
+		UsersOn[i]['count'] +=1
+
 	session['code'] = code
 	session['username'] = username
 	session['name'] = displayName
 	session['logged_in'] = True
 	session['a_token'] = user_.access_token
-	print(user_.access_token)
-	print(user_.refresh_token)
-	print(user_.token_expires)
+	print("Novo usersON:")
+	print(UsersOn)
 
-	#UsersOn[onID]['access_token']=access_token
-	#UsersOn[onID]['refresh_token']=refresh_token
-	#UsersOn[onID]['Location']=None
-	#UsersOn[onID]['Building']=None
-	#UsersOn[onID]['Campus']=None
-	#UsersOn[onID]['Range']=100 #default
-	
-	#onID = onID+1
 	return redirect(url_for('MainpageDone'))
 
 @app.route('/User/MainpageDone', methods=['GET'])
 @login_required
 def MainpageDone():
 	return render_template("Usertemplate.xhtml")
-
-@app.route('/User/getToken', methods=['POST'])
-def getToken():
-	test = request.json
-	#print(test['code'])
-	#print("endtest")
-	#content = request.get_json()
-	#print(str(content))
-	#print(str(content["code"]))
-	#print(str(content["code"]).split('=')[1])
-	#url = "http://127.0.0.1:5000/API/User/Tokencode"
-	#user = client.get_user_by_code(str(content["code"]).split('=')[1])
-	#person = client.get_person(user)
-	#print(person)
-	#r = r.json()
-	#print(data)
-	#print(user)
-	#new = json.loads(jsonify(user))
-	#json.dumps(new, indent=4, sort_keys=True)
-	#person = client.get_person(user)
-	#new2 = json.loads(person)	
-	#json.dumps(new2, indent=4, sort_keys=True)
-	return jsonify( [{"result": "Logs updated"}] )
-
-
 
 #  Admin API
 @app.route('/API/Admin/GetBuildsLocations', methods=['POST'])
@@ -191,7 +186,6 @@ def BuildsLocations():
 			try:
 				if content2[0]['campus'] in content2[i]['campus'].lower():
 					collection.insert_one(content2[i])
-					print("ok")
 			except errors.DuplicateKeyError:
 				err= err +1
 			i=i+1
@@ -234,7 +228,7 @@ def ListUsersInsideB():
 			collection = db["logs"]
 			for c in collection.find({"type" : "move", "building" : building_id, "checkout" : "0"},{'_id': False}):
 				ret.append(c['user'])
-				print(type(ret))
+				# print(type(ret))
 			if len(ret) == 0:
 				return json.dumps("There are no users currently in the given building.")
 			else:
@@ -290,15 +284,16 @@ def addBot():
 #  User API
 
 
-
 @app.route('/API/User/PostmyLocation', methods=['POST'])
 def PostmyLocal():
-	#User envia localizaçao e nome e atualiza. Isto depois deve atualizar na BD
+
+	if getToken(session['username']) != session['a_token']:
+		session['logged_in'] = False
+		return jsonify([{"result": "-1"}])
+
 	content = request.json
 	building, campus, building_id = getBuilding(content["location"][0], content["location"][1])
-	print(building)
-	print(campus)
-	print(building_id)
+
 	if building is None:
 		#  No building exists for this coordinates
 		return jsonify( [{"result": "Log not inserted - There's no building in this coordinates"}] )
@@ -309,55 +304,35 @@ def PostmyLocal():
 			collection.insert_one(
 				move_log(str(datetime.datetime.now()), "0", session['username'], building_id, campus,
 						 content["location"][0], content["location"][1]).toDict())
+			i=find_index(UsersOn,'username',session['username'])
+			print("i é %d" % i)
+			UsersOn[i]["location"] = [content["location"][0], content["location"][1]]
+			UsersOn[i]["building"] = building_id
+			UsersOn[i]["campus"] = campus
 			return jsonify([{"result": "New log was inserted for this location (checkin)"}])
 		else:
 			#  Checkin already done, so update the document if the location changed. else do nothing.
 			c = collection.find_one({"type":"move", "checkout":"0", "user": session['username']})
-			print(c)
 			if c['building'] != building_id:
-				#  Building change. Checkout of old building and checking on the new one.
+				#  Building change. Checkout of old building and checkin on the new one.
 				collection.update_one({"type":"move", "checkout":"0", "user": session['username']},{"$set":
 				{"checkout":str(datetime.datetime.now())}})
 				collection.insert_one(
 					move_log(str(datetime.datetime.now()), "0", session['username'], building_id, campus,
 							 content["location"][0], content["location"][1]).toDict())
-				for i in UsersOn:
-					if i["username"]==session['username']:
-						i["location"]=[content["location"][0], content["location"][1]]
-						i["building"]=building_id
-						i["campus"]=campus
+				# Actualizar location no UsersOn. Para depois ver range msg.
+				i = find_index(UsersOn, 'username', session['username'])
+				UsersOn[i]["location"] = [content["location"][0], content["location"][1]]
+				UsersOn[i]["building"] = building_id
+				UsersOn[i]["campus"] = campus
 				return jsonify([{"result": "Location was updated"}])
 			else:
-				#  Same building, update location only
-				collection.update_one({"type": "move", "checkout": "0", "user": session['username']},
-									  {"$set": {"location":{"latitude": content["location"][0], "longitude" : content["location"][1]}}})
+				#  Same building, update location only - no need
+				#collection.update_one({"type": "move", "checkout": "0", "user": session['username']},
+				#					  {"$set": {"location":{"latitude": content["location"][0], "longitude" : content["location"][1]}}})
+				i = find_index(UsersOn, 'username', session['username'])
+				UsersOn[i]["location"] = [content["location"][0], content["location"][1]]
 				return jsonify([{"result": "Same Location"}])
-
-
-	# if getBuilding(content["location"][0], content["location"][1]) == {}
-	# 	#  Building não existe na BD.
-	# 	return jsonify([{"result": "The given coordinates do not correspond to a stored building"}])
-	# if collection.count_documents({"type":"move", })
-	#test = session['username'] + "lat -> " + str(content["location"][0]) + "long ->" + str(content["location"][0])
-	#print(test)
-
-	# print(content)
-	# print(content["name"])
-	# location=[content["location"][0], content["location"][1]]
-	# building,campus = getBuilding(int(content["location"][0]), int(content["location"][1]))
-	# obj = {"type": "move", "user": content["name"], "date": datetime.datetime.now()}
-	# for i, value in UsersOn.items():
-	# 	if value['naforme']==str(content["name"]):
-	# 		if value['Location'] != location:
-	# 			value['Location']=[content["location"][0],content["location"][1]]
-	# 			value['Building'],value['Campus']=building,campus
-	# 			print(value['Building'], value['Campus'])
-	# 			obj['Location']=value['Location']
-	# 			obj['Building']=value['Building']
-	# 			obj['Campus']=value['Campus']
-	# 			collection.insert_one(obj)
-	# 			return jsonify( [{"result": "Logs updated"}] )
-	#return jsonify( [{"result": "Same Location"}] )
 
 @app.route('/API/User/SendBroadMsg/<idName>', methods=['POST'])
 def SendMsg(idName):
@@ -381,20 +356,15 @@ def SendMsg(idName):
 @app.route('/API/User/DefineRange/<idName>', methods=['POST'])
 def DefineRange(idName):
 	content = request.get_json()
-	print(session['username'])
-	print(content['Range'])
 	collection = db["logs"]
 	collection.update_one({"type" : "move", "user": session['username'], "checkout":"0"},
 						  {"$set":{"range":content['Range']}})
-	return jsonify({"ok":"ok"})
-	# for key,value in UsersOn.items():
-	# 	if idName == value['name']:
-	# 		objself=key
-	# 		print(objself)
-	# 	break
-	# UsersOn[objself]['Range']=int(content["Range"])
-	# print("range:"+str(UsersOn[objself]['Range']))
-	# return jsonify( {"Result":"Range updated" })
+	i=find_index(UsersOn,'username', session['username'])
+	print(i)
+	UsersOn[i]['range']=content['Range']
+	string = "Range updated to %s" % content['Range']
+	return jsonify({"result":string})
+
 
 @app.route('/API/User/RecvMsg/<idUser>', methods=['GET'])
 def RecvMsg(idUser):
@@ -437,7 +407,6 @@ def BotMsgHandle(idBot):
 
 @app.route('/GetBuilding/<lat>/<long>')
 def getBuilding(lat, long):
-	print(request.method)
 	if type(lat) != float:
 		lat = float(lat)
 	if type(long) != float:
@@ -451,23 +420,28 @@ def getBuilding(lat, long):
 	else:
 		campus="alameda"
 	collection = db[campus]
-	min_range = 10000
+	min_range = 30.01
 	building = ""
+	building_id=""
+	in_range=[]
+	in_building=[]
 	for c in collection.find():
 		d = calculateDistance(float(c['latitude']), float(c['longitude']), lat, long)
-		print("b : %s, d= %f -- min range: %f" % (c['name'], d, min_range))
+		#print(d)
 		if d < min_range:
 			min_range = d
 			building = c['name']
 			building_id = c['id']
+	#in_range = #ver users in range
 	if min_range == 30.01:
 		if request.method == "GET":
-			return jsonify({"building" : None, "campus": None})
+			return jsonify({"building" : None, "campus": None, "building_id": None, "in_range":in_range, "in_build":in_building})
 		else:
 			return None, None, None
 	else:
 		if request.method == "GET":
-			return jsonify({"building":building, "campus":campus})
+			in_building = get_users_in_building(session['username'],building_id)
+			return jsonify({"building":building, "campus":campus, "building_id":building_id,"in_build":in_building, "in_range":in_range})
 		else:
 			return building, campus, building_id
 
@@ -480,6 +454,35 @@ def calculateDistance(b_lat, b_long, u_lat, u_long):
 	c = 2 * asin(sqrt(a))
 	r = 6371 * 1000  # Radius of earth in meters.
 	return c*r
+
+
+def getToken(userID):
+	i=0
+	while i < len(UsersOn):
+		if UsersOn[i]['username'] == userID:
+			return UsersOn[i]['user'].access_token
+		i +=1
+	return 0
+
+def find_index(dicts, key, value):
+    class Null: pass
+    for i, d in enumerate(dicts):
+        if d.get(key, Null) == value:
+            return i
+    else:
+        return -1
+
+def get_users_in_building(userid, buildingid):
+	l=[]
+	for i in UsersOn:
+		if i['username'] != userid and i['building'] == buildingid:
+			l.append(i['username'])
+	if l.__len__()==0:
+		l = None
+	print("vou devolver:")
+	print(l)
+	return l
+
 
 if __name__ == '__main__':
 	app.run()

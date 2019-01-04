@@ -11,7 +11,7 @@
             background-color: #00FFFF;
         }
     </style>
-    <title>Administrator browser</title>
+    <title>ASINT Project Dashboard</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
@@ -23,8 +23,8 @@
 <div class="background" id="curr_building">Getting building...</div>
 <div class="background" id="serverresp">(Server response)</div>
 <div class="background" id="range">Current Range is 30m.</div>
-<div class="background" id="in_build">TODO: users in the same building.</div>
-<div class="background" id="in_range">TODO: users in the messaging range.</div>
+<div class="background" id="in_build">Getting users in the same building...</div>
+<div class="background" id="in_range">Getting users in the defined range...</div>
 
 <h2>Commands</h2>
 <input type="text" name="" size="20" id="Range" />
@@ -38,6 +38,7 @@
 <form action ="/User/Logout" id="LogoutForm"  method = 'post'>
    <button type ="submit" id="ButtonLogout" value="Logout">Logout</button>
 </form>
+
 
 
 
@@ -68,14 +69,32 @@
             url:"/GetBuilding/" + lat +"/" + lon,
             success : function( response) {
                 if (response['building'] != null){
-                    $("#curr_building").text("You are currently in " + response['building'] + " in campus "+ response['campus']);
+                    $("#curr_building").text("You are currently in " + response['building'] + " in campus "+ response['campus']+ " (id: "+response['building_id']+")");
+                    if(response['in_build'] == null){
+                        $("#in_build").text("There are no users in the building.");
+                    }else{
+                        $("#in_build").text("The following users are in the same building: "+response['in_build']);
+                    }
+                    if(response['in_range'] == null){
+                        $("#in_range").text("There are no users in the defined range.");
+                    }else{
+                        $("#in_range").text("The following users are in the defined messaging range: "+response['in_range']);
+                    }
                 }
                 if (response['building'] == null){
                     $("#curr_building").text("You are currently not in one of the available buildings");
+                    $("#in_build").text("Users in Building functionality unavailable.");
+                    if(response['in_range'] == null){
+                        $("#in_range").text("There are no users in the defined range.");
+                    }else{
+                        $("#in_range").text("The following users are in the defined messaging range: "+response['in_range']);
+                    }
                 }
             },
             error : function(){
                 $("#curr_building").text("Getting your building...");
+                $("#in_build").text("Getting users in building...");
+                $("#in_range").text("Getting users in range...");
             }
         });
     }
@@ -83,7 +102,7 @@
     function postLocation(position){
         var lat = position.coords.latitude;
         var lon = position.coords.longitude;
-        var result = document.getElementById("serverresp");
+
         var authname = document.getElementById("authenticate");
         postData = {"name": authname.innerHTML, "location":[lat,lon]};
 
@@ -94,14 +113,18 @@
             data:JSON.stringify(postData),
             dataType: 'json',
             success: function (response) {
-                $("#serverresp").text(response[0]["result"]);
+                console.log(response);
+                if(response[0]["result"]==-1){
+                    $( "#LogoutForm" ).trigger( "submit" );
+                }else{
+                    $("#serverresp").text(response[0]["result"]);
+                }
             }
         })
     }
     $( document ).ready(function() {
         $( "#Sendbutton" ).click(function( event ) {
             var authname = document.getElementById("authenticate").innerHTML;
-            console.log("click");
             $.ajax({
                 type: "POST",
                 url: "http://127.0.0.1:5000/API/User/SendBroadMsg/"+authname,
@@ -125,7 +148,6 @@
 
         $( "#Recvbutton" ).click(function( event ) {
             var authname = document.getElementById("authenticate").innerHTML;
-            console.log("click");
             $.ajax({
                 type: "GET",
                 url: "http://127.0.0.1:5000/API/User/RecvMsg/"+authname,
@@ -158,15 +180,19 @@
 
         $( "#DefineRange" ).click(function( event ) {
             var authname = document.getElementById("authenticate").innerHTML;
-            console.log("click");
             $.ajax({
                 type: "POST",
                 url: "http://127.0.0.1:5000/API/User/DefineRange/"+authname,
                 dataType: "json",
                 contentType: "application/json",
                 data: '{"name":"' + authname + '","Range":"' + $("#Range").val() + '"}',
-                success: function (data) {
-                    $("#range").text("Current Range is "+$("#Range").val() +"m.");
+                success: function (response) {
+                    if(response["result"]==-1){
+                        $( "#LogoutForm" ).trigger( "submit" );
+                    }else{
+                        $("#range").text("Current Range is "+$("#Range").val() +"m.");
+                        $("#serverresp").text(response["result"]);
+                    }
                 },
                 error: function(xhr){
                     console.log(xhr);

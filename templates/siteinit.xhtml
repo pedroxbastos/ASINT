@@ -21,6 +21,16 @@
 <h4>If you are already logged in in Fenix, the Login button will take you to the Mainpage, else you'll have to log
 in through Fenix.</h4>
 
+    {% with messages = get_flashed_messages() %}
+         {% if messages %}
+            <ul>
+               {% for message in messages %}
+               <li>{{ message }}</li>
+               {% endfor %}
+            </ul>
+         {% endif %}
+      {% endwith %}
+
     <form action="/User/Login" method="get">
         <input type="submit" value="Login"></input>
     </form>
