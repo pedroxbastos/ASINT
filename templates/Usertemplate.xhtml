@@ -21,8 +21,8 @@
 <div class="background" id="name">{{session.name}}</div>
 <div class="background" id="locationspot">Getting coordinates...</div>
 <div class="background" id="curr_building">Getting building...</div>
-<div class="background" id="serverresp">(Server response)</div>
-<div class="background" id="range">Current Range is 30m.</div>
+<div class="background" id="serverresp">Getting server response...</div>
+<div class="background" id="range">Getting current range...</div>
 <div class="background" id="in_build">Getting users in the same building...</div>
 <div class="background" id="in_range">Getting users in the defined range...</div>
 
@@ -53,7 +53,6 @@
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
             navigator.geolocation.getCurrentPosition(postLocation);
-            navigator.geolocation.getCurrentPosition(getCurrBuilding);
         } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
         }
@@ -114,11 +113,13 @@
             dataType: 'json',
             success: function (response) {
                 console.log(response);
-                if(response[0]["result"]==-1){
+                if(response["result"]==-1){
                     $( "#LogoutForm" ).trigger( "submit" );
                 }else{
-                    $("#serverresp").text(response[0]["result"]);
+                    $("#serverresp").text(response["result"]);
                 }
+                $("#range").text("The current messaging range is "+response['range']+"m.");
+                getCurrBuilding(position);
             }
         })
     }
@@ -182,7 +183,7 @@
             var authname = document.getElementById("authenticate").innerHTML;
             $.ajax({
                 type: "POST",
-                url: "http://127.0.0.1:5000/API/User/DefineRange/"+authname,
+                url: "http://127.0.0.1:5000/API/User/DefineRange",
                 dataType: "json",
                 contentType: "application/json",
                 data: '{"name":"' + authname + '","Range":"' + $("#Range").val() + '"}',
@@ -190,8 +191,13 @@
                     if(response["result"]==-1){
                         $( "#LogoutForm" ).trigger( "submit" );
                     }else{
-                        $("#range").text("Current Range is "+$("#Range").val() +"m.");
+                        $("#range").text("The current messaging range is "+response['range']+"m.");
                         $("#serverresp").text(response["result"]);
+                        if(response['in_range'] == null){
+                            $("#in_range").text("There are no users in the defined range.");
+                        }else{
+                            $("#in_range").text("The following users are in the defined messaging range: "+response['in_range']);
+                        }
                     }
                 },
                 error: function(xhr){

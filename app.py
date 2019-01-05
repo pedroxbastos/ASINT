@@ -23,12 +23,7 @@ UsersOn = []
 BotsOn = {}
 #Available tokens to init bots
 token_bot_queue = []
-onID = 0
-#session.clear()
-#logs = {}
 
-#def addLog(name,Location):
-#	logs.update({name:Location})
 
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
@@ -124,7 +119,6 @@ def logout():
 @app.route('/User/Mainpage', methods = ['POST', 'GET'])
 def main_user():
 	#  Needed again
-	global onID
 	config = fenixedu.FenixEduConfiguration.fromConfigFile('fenixedu.ini')
 	client = fenixedu.FenixEduClient(config)
 	try:
@@ -142,7 +136,7 @@ def main_user():
 
 	i= find_index(UsersOn, 'username', username)
 	if i == -1:
-		UsersOn.append({"username" : username, "name": displayName, "user":user_, "range":0, "a_token": user_.access_token, "count":1,
+		UsersOn.append({"username" : username, "name": displayName, "user":user_, "range":30, "a_token": user_.access_token, "count":1,
 						"building":None, "campus": None, "location":None})
 		Messages[username] = []
 	else:
@@ -289,27 +283,38 @@ def PostmyLocal():
 
 	if getToken(session['username']) != session['a_token']:
 		session['logged_in'] = False
-		return jsonify([{"result": "-1"}])
+		return jsonify({"result": "-1"})
 
 	content = request.json
+	i = find_index(UsersOn, 'username', session['username'])
+	#  Most recent location inserted into UsersOn
+	UsersOn[i]['location']=[content["location"][0], content["location"][1]]
+	print(type(UsersOn[i]['location']))
+	print(UsersOn[i]['location'])
+	print(UsersOn[i]['location'][0])
+	print(UsersOn[i]['location'][1])
+
+
 	building, campus, building_id = getBuilding(content["location"][0], content["location"][1])
+	collection = db["logs"]
 
 	if building is None:
-		#  No building exists for this coordinates
-		return jsonify( [{"result": "Log not inserted - There's no building in this coordinates"}] )
+		#  No building exists for this coordinates. Verify if there was a change in building aswell
+		if collection.count_documents({"type":"move", "checkout":"0", "user": session['username']}) != 0:
+			collection.update_one({"type": "move", "checkout": "0", "user": session['username']}, {"$set":
+				{"checkout": str(datetime.datetime.now())}})
+		UsersOn[i]["building"] = None
+		UsersOn[i]["campus"] = None
+		return jsonify({"result": "Log not inserted - There's no building in this coordinates", "range":UsersOn[i]['range']})
 	else:
-		collection = db["logs"]
 		if collection.count_documents({"type":"move", "checkout":"0", "user": session['username']}) == 0:
 			#  New log insertion
 			collection.insert_one(
 				move_log(str(datetime.datetime.now()), "0", session['username'], building_id, campus,
 						 content["location"][0], content["location"][1]).toDict())
-			i=find_index(UsersOn,'username',session['username'])
-			print("i é %d" % i)
-			UsersOn[i]["location"] = [content["location"][0], content["location"][1]]
 			UsersOn[i]["building"] = building_id
 			UsersOn[i]["campus"] = campus
-			return jsonify([{"result": "New log was inserted for this location (checkin)"}])
+			return jsonify({"result": "New log was inserted for this location (checkin)", "range":UsersOn[i]['range']})
 		else:
 			#  Checkin already done, so update the document if the location changed. else do nothing.
 			c = collection.find_one({"type":"move", "checkout":"0", "user": session['username']})
@@ -320,19 +325,17 @@ def PostmyLocal():
 				collection.insert_one(
 					move_log(str(datetime.datetime.now()), "0", session['username'], building_id, campus,
 							 content["location"][0], content["location"][1]).toDict())
-				# Actualizar location no UsersOn. Para depois ver range msg.
-				i = find_index(UsersOn, 'username', session['username'])
-				UsersOn[i]["location"] = [content["location"][0], content["location"][1]]
+				# Actualizar building e campus. Location actualizada logo no início.
 				UsersOn[i]["building"] = building_id
 				UsersOn[i]["campus"] = campus
-				return jsonify([{"result": "Location was updated"}])
+				return jsonify({"result": "Location was updated", "range":UsersOn[i]['range']})
 			else:
-				#  Same building, update location only - no need
+				#  Same building, update location only in UsersOn
 				#collection.update_one({"type": "move", "checkout": "0", "user": session['username']},
 				#					  {"$set": {"location":{"latitude": content["location"][0], "longitude" : content["location"][1]}}})
-				i = find_index(UsersOn, 'username', session['username'])
-				UsersOn[i]["location"] = [content["location"][0], content["location"][1]]
-				return jsonify([{"result": "Same Location"}])
+				#i = find_index(UsersOn, 'username', session['username'])
+				#UsersOn[i]["location"] = [content["location"][0], content["location"][1]]
+				return jsonify({"result": "Same Location", "range":UsersOn[i]['range']})
 
 @app.route('/API/User/SendBroadMsg/<idName>', methods=['POST'])
 def SendMsg(idName):
@@ -353,17 +356,19 @@ def SendMsg(idName):
 	collection.insert_one(obj)
 	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
 
-@app.route('/API/User/DefineRange/<idName>', methods=['POST'])
-def DefineRange(idName):
+@app.route('/API/User/DefineRange', methods=['POST'])
+def DefineRange():
 	content = request.get_json()
 	collection = db["logs"]
 	collection.update_one({"type" : "move", "user": session['username'], "checkout":"0"},
 						  {"$set":{"range":content['Range']}})
 	i=find_index(UsersOn,'username', session['username'])
 	print(i)
-	UsersOn[i]['range']=content['Range']
+	UsersOn[i]['range']=float(content['Range'])
 	string = "Range updated to %s" % content['Range']
-	return jsonify({"result":string})
+	in_range = []
+	in_range = get_users_in_range(session['username'])
+	return jsonify({"result":string, "range":UsersOn[i]['range'], "in_range": in_range})
 
 
 @app.route('/API/User/RecvMsg/<idUser>', methods=['GET'])
@@ -431,7 +436,7 @@ def getBuilding(lat, long):
 			min_range = d
 			building = c['name']
 			building_id = c['id']
-	#in_range = #ver users in range
+	in_range = get_users_in_range(session['username'])
 	if min_range == 30.01:
 		if request.method == "GET":
 			return jsonify({"building" : None, "campus": None, "building_id": None, "in_range":in_range, "in_build":in_building})
@@ -482,6 +487,19 @@ def get_users_in_building(userid, buildingid):
 	print(l)
 	return l
 
+def get_users_in_range(userid):
+	l=[]
+	i=find_index(UsersOn, 'username', userid)
+	for u in UsersOn:
+		if u['location'] is None:
+			print("location do %s é None" % u['username'])
+		elif u['username'] != userid and UsersOn[i]['range'] > calculateDistance(UsersOn[i]['location'][0],UsersOn[i]['location'][1], u['location'][0], u['location'][1]):
+			l.append(u['username'])
+	if l.__len__()==0:
+		l=None
+	print("RANGE:vou devolver:")
+	print(l)
+	return l
 
 if __name__ == '__main__':
 	app.run()
