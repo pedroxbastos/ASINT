@@ -54,18 +54,8 @@ def after_request(response):
 	#response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
 	return response
 
-
 @app.route('/')
 def hello_world():
-	if session.get('username'):
-		print("ha sessão.")
-		print(session['username'])
-		print(session['name'])
-		print(session['logged_in'])
-		print(UsersOn)
-	else:
-		print("no session")
-		print(UsersOn)
 	return render_template("siteinit.xhtml") 
 
 def login_required(f):
@@ -259,6 +249,7 @@ def getUserHistory():
 
 @app.route('/API/insert', methods=['POST'])
 def addLog():
+	#  Just for testing.
 	content=request.json
 	content2 = json.loads(content.replace("'", "\""))
 	collection = db["logs"]
@@ -363,7 +354,6 @@ def DefineRange():
 	collection.update_one({"type" : "move", "user": session['username'], "checkout":"0"},
 						  {"$set":{"range":content['Range']}})
 	i=find_index(UsersOn,'username', session['username'])
-	print(i)
 	UsersOn[i]['range']=float(content['Range'])
 	string = "Range updated to %s" % content['Range']
 	in_range = []
@@ -500,6 +490,19 @@ def get_users_in_range(userid):
 	print("RANGE:vou devolver:")
 	print(l)
 	return l
+
+@app.before_first_request
+def verify_wrong_logs():
+	collection = db['logs']
+	z=0
+	print("ola!")
+	for c in collection.find({"type":"move", "checkout":"0"}):
+		checkout = datetime.datetime.strptime(c["checkin"],'%Y-%m-%d %H:%M:%S.%f') + datetime.timedelta(minutes=1)
+		collection.update_one({"_id":c["_id"]},{"$set":{"checkout": str(checkout)}})
+		z += 1
+	print("c é %d"%z)
+	return
+
 
 if __name__ == '__main__':
 	app.run()
