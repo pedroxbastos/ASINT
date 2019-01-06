@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0b03562f-0754-4dd6-95ba-81c9c0b56f72" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/Logs.py" beforeDir="false" afterPath="$PROJECT_DIR$/Logs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/Usertemplate.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Usertemplate.xhtml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,7 +16,7 @@
     <favorites_list name="ASINT" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.65410703">
+    <splitter split-orientation="horizontal" split-proportion="0.40241146">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -32,8 +34,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Logs.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state>
-                  <caret line="26" column="61" selection-start-line="26" selection-start-column="61" selection-end-line="26" selection-end-column="61" />
+                <state relative-caret-position="80">
+                  <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
                 </state>
               </provider>
             </entry>
@@ -41,12 +43,11 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="270">
-                  <caret line="502" column="20" selection-start-line="502" selection-start-column="20" selection-end-line="502" selection-end-column="20" />
+                <state relative-caret-position="-2754">
+                  <caret line="131" column="17" selection-start-line="131" selection-start-column="17" selection-end-line="131" selection-end-column="17" />
                   <folding>
                     <element signature="e#0#32#0" expanded="true" />
                     <element signature="e#1995#2511#0" />
-                    <element signature="e#2494#3681#0" />
                     <element signature="e#4464#5005#0" />
                     <element signature="e#5087#5484#0" />
                     <element signature="e#5576#5687#0" />
@@ -54,17 +55,10 @@
                     <element signature="e#6495#7445#0" />
                     <element signature="e#7526#7684#0" />
                     <element signature="e#7730#7938#0" />
-                    <element signature="e#11359#11972#0" />
-                    <element signature="e#12063#12330#0" />
-                    <element signature="e#12677#12831#0" />
                     <element signature="e#12912#13089#0" />
-                    <element signature="e#13180#13490#0" />
                     <element signature="e#13312#14420#0" />
                     <element signature="e#14651#15007#0" />
-                    <element signature="e#14637#14885#0" />
-                    <element signature="e#14841#14978#0" />
                     <element signature="e#14724#14908#0" />
-                    <element signature="e#15294#15711#0" />
                   </folding>
                 </state>
               </provider>
@@ -116,8 +110,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/templates/Usertemplate.xhtml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="408">
-                  <caret line="199" column="24" selection-start-line="199" selection-start-column="24" selection-end-line="199" selection-end-column="24" />
+                <state relative-caret-position="364">
+                  <caret line="148" column="11" lean-forward="true" selection-start-line="148" selection-start-column="11" selection-end-line="148" selection-end-column="11" />
                 </state>
               </provider>
             </entry>
@@ -171,6 +165,8 @@
       <find>calculate</find>
       <find>calculateD</find>
       <find>calculat</find>
+      <find>veri</find>
+      <find>verify_m</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -196,9 +192,9 @@
         <option value="$PROJECT_DIR$/jhgf.py" />
         <option value="$PROJECT_DIR$/templates/reset.css" />
         <option value="$PROJECT_DIR$/templates/homepage.xhtml" />
-        <option value="$PROJECT_DIR$/Logs.py" />
         <option value="$PROJECT_DIR$/Administrator.py" />
         <option value="$PROJECT_DIR$/templates/siteinit.xhtml" />
+        <option value="$PROJECT_DIR$/Logs.py" />
         <option value="$PROJECT_DIR$/templates/Usertemplate.xhtml" />
         <option value="$PROJECT_DIR$/app.py" />
       </list>
@@ -306,8 +302,8 @@
   <component name="ToolWindowManager">
     <frame x="0" y="25" width="1600" height="875" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49802372" visible="true" weight="0.13942932" />
-      <window_info id="Structure" order="1" sideWeight="0.5019763" side_tool="true" visible="true" weight="0.13942932" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49788135" visible="true" weight="0.13942932" />
+      <window_info id="Structure" order="1" sideWeight="0.50211865" side_tool="true" visible="true" weight="0.13942932" />
       <window_info id="Favorites" order="2" sideWeight="0.5010352" side_tool="true" weight="0.13553827" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -317,7 +313,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32963988" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49946293" visible="true" weight="0.29916897" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49946293" visible="true" weight="0.3462604" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50053704" side_tool="true" weight="0.28417653" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.26869807" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -387,13 +383,6 @@
     <entry file="file://$PROJECT_DIR$/static/homepage.xhtml" />
     <entry file="file://$PROJECT_DIR$/static/reset.css" />
     <entry file="file://$PROJECT_DIR$/static/styles.css" />
-    <entry file="file://$PROJECT_DIR$/Logs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="26" column="61" selection-start-line="26" selection-start-column="61" selection-end-line="26" selection-end-column="61" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/jquery-ui.css">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -425,13 +414,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/Usertemplate.xhtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="199" column="24" selection-start-line="199" selection-start-column="24" selection-end-line="199" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Bot.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="533">
@@ -452,14 +434,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Logs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/Usertemplate.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="148" column="11" lean-forward="true" selection-start-line="148" selection-start-column="11" selection-end-line="148" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="502" column="20" selection-start-line="502" selection-start-column="20" selection-end-line="502" selection-end-column="20" />
+        <state relative-caret-position="-2754">
+          <caret line="131" column="17" selection-start-line="131" selection-start-column="17" selection-end-line="131" selection-end-column="17" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
             <element signature="e#1995#2511#0" />
-            <element signature="e#2494#3681#0" />
             <element signature="e#4464#5005#0" />
             <element signature="e#5087#5484#0" />
             <element signature="e#5576#5687#0" />
@@ -467,17 +462,10 @@
             <element signature="e#6495#7445#0" />
             <element signature="e#7526#7684#0" />
             <element signature="e#7730#7938#0" />
-            <element signature="e#11359#11972#0" />
-            <element signature="e#12063#12330#0" />
-            <element signature="e#12677#12831#0" />
             <element signature="e#12912#13089#0" />
-            <element signature="e#13180#13490#0" />
             <element signature="e#13312#14420#0" />
             <element signature="e#14651#15007#0" />
-            <element signature="e#14637#14885#0" />
-            <element signature="e#14841#14978#0" />
             <element signature="e#14724#14908#0" />
-            <element signature="e#15294#15711#0" />
           </folding>
         </state>
       </provider>

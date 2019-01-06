@@ -9,13 +9,14 @@ class message_log:
         self.message = message
         self.building_id = building_id
         self.campus = campus
+        self.sent = 0
 
 
     def __str__(self):
         return "LogType: Message. Date : %s;  From %s to %s in building %s, campus %s. Message: %s" % (self.date, self.from_, self.to, self.building_id, self.campus, self.message)
 
     def toDict(self):
-        return {"date" : self.date, "type" : "message", "from" : self.from_, "to" : self.to, "building" : self.building_id, "campus" : self.campus, "message": self.message}
+        return {"date" : self.date, "type" : "message","sent":self.sent, "from" : self.from_, "to" : self.to, "building" : self.building_id, "campus" : self.campus, "message": self.message}
 
 class move_log:
 

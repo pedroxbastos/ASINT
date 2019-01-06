@@ -34,7 +34,7 @@
 <input type="submit" value="Send"  id="Sendbutton"/>
 <p></p>
 <button type="button" id="Recvbutton">Receive Messages</button>
-<div id="fieldMsg">(Messages will be here)</div>
+<div id="fieldMsg">Received Messages:<p></p></div>
 <form action ="/User/Logout" id="LogoutForm"  method = 'post'>
    <button type ="submit" id="ButtonLogout" value="Logout">Logout</button>
 </form>
@@ -48,6 +48,7 @@
 
     geoLocal();
     var periodiclocal = setInterval(geoLocal,60000);
+    var periodicmsg = setInterval(automsg,5000);
     var x = document.getElementById("locationspot");
     function geoLocal() {
         if (navigator.geolocation) {
@@ -57,6 +58,10 @@
         x.innerHTML = "Geolocation is not supported by this browser.";
         }
     }
+    function automsg(){
+        $( "#Recvbutton" ).trigger( "click" );
+    }
+
     function showPosition(position) {
         x.innerHTML = "Latitude: " + position.coords.latitude +
         "<br>Longitude: " + position.coords.longitude;
@@ -128,12 +133,17 @@
             var authname = document.getElementById("authenticate").innerHTML;
             $.ajax({
                 type: "POST",
-                url: "http://127.0.0.1:5000/API/User/SendBroadMsg/"+authname,
+                url: "http://127.0.0.1:5000/API/User/SendBroadMsg",
                 dataType: "json",
                 contentType: "application/json",
                 data: '{"name":"' + authname + '","Message":"' + $("#Messagetosend").val() + '"}',
-                success: function (data) {
-                    console.log(data);
+                success: function (response) {
+                    if(response["result"]==-1){
+                        $( "#LogoutForm" ).trigger( "submit" );
+                    }else{
+                        $("#serverresp").text(response["result"]);
+                        $("#in_range").text("The following users are in the defined messaging range: "+response['in_range']);
+                    }
                 }
             });
         });
@@ -149,6 +159,7 @@
 
         $( "#Recvbutton" ).click(function( event ) {
             var authname = document.getElementById("authenticate").innerHTML;
+
             $.ajax({
                 type: "GET",
                 url: "http://127.0.0.1:5000/API/User/RecvMsg/"+authname,
@@ -156,25 +167,15 @@
                 contentType: "application/json",
                 success: function (data) {
                     console.log(data);
-                    s = "<ol>";
-                    //for (var i = 0, len = data.length; i < len; i++) {
-                    //    s += "<li>";
-                    //    s += data[i];
-                    //    s += "</li>";
-                    //}
-                    s="Messages Received:"
-                    for (var key in data) {
-                        if (data.hasOwnProperty(key)) {
-                            console.log(key + " -> " + data[key]);
-                            for (var i = 0, len = data[key].length; i < len; i++) {
-                                s += "<li>";
-                                s += data[key][i]
-                                s += "</li>";
-                            }
-                        }
+                    s = "<ul>";
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        s += "<li>";
+                        s += data[i];
+                        s += "</li>";
                     }
-                    s += "</ol>";
-                    $("#fieldMsg").html(s);
+                    s += "</ul>";
+                    $("#fieldMsg").append(s);
+
                 }
             });
         });

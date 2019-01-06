@@ -129,6 +129,7 @@ def main_user():
 		UsersOn.append({"username" : username, "name": displayName, "user":user_, "range":30, "a_token": user_.access_token, "count":1,
 						"building":None, "campus": None, "location":None})
 		Messages[username] = []
+		#verify_messages_not_sent(username)
 	else:
 		# Primeiro fazer o checkout da sessão que estava activa
 		collection = db['logs']
@@ -271,7 +272,6 @@ def addBot():
 
 @app.route('/API/User/PostmyLocation', methods=['POST'])
 def PostmyLocal():
-
 	if getToken(session['username']) != session['a_token']:
 		session['logged_in'] = False
 		return jsonify({"result": "-1"})
@@ -280,11 +280,6 @@ def PostmyLocal():
 	i = find_index(UsersOn, 'username', session['username'])
 	#  Most recent location inserted into UsersOn
 	UsersOn[i]['location']=[content["location"][0], content["location"][1]]
-	print(type(UsersOn[i]['location']))
-	print(UsersOn[i]['location'])
-	print(UsersOn[i]['location'][0])
-	print(UsersOn[i]['location'][1])
-
 
 	building, campus, building_id = getBuilding(content["location"][0], content["location"][1])
 	collection = db["logs"]
@@ -328,24 +323,45 @@ def PostmyLocal():
 				#UsersOn[i]["location"] = [content["location"][0], content["location"][1]]
 				return jsonify({"result": "Same Location", "range":UsersOn[i]['range']})
 
-@app.route('/API/User/SendBroadMsg/<idName>', methods=['POST'])
-def SendMsg(idName):
-	collection = db.logs
-	content = request.get_json()
-	objself=None
-	for obj in UsersOn:
-		if obj["username"]==session['username']:
-			objself=obj
-	print(UsersOn)
-	for obj in UsersOn:
-		if obj != objself:
-			if calculateDistance(obj['Location'][0], obj['Location'][1], objself['location'][0], objself['location'][1]) < objself['range']:
-				Messages[session["username"]].append(content["Message"])
+@app.route('/API/User/SendBroadMsg', methods=['POST'])
+def SendMsg():
 
-	print(Messages)
-	obj = {"type": "Message", "user": session["username"], "date": datetime.datetime.now(), "content":content["Message"]}
-	collection.insert_one(obj)
-	return jsonify( {"aaa":12, "bbb": ["bbb", 12, 12] })
+	if getToken(session['username']) != session['a_token']:
+		session['logged_in'] = False
+		return jsonify({"result": "-1"})
+
+	collection = db['logs']
+	content = request.get_json()
+
+	z = find_index(UsersOn, 'username', session['username'])
+	in_range = get_users_in_range(session['username'])
+	if in_range is None:
+		return jsonify({"result":"There are no users in the defined range. No message was sent"})
+	else:
+		for i in in_range:
+			Messages[i].append(content['Message'])
+			#  Insert in the DB. Then update if delivered - to solve sent messages that are not delivered.
+			collection.insert_one(message_log(str(datetime.datetime.now()),i,session['username'],content['Message'],UsersOn[z]['building'],UsersOn[z]['campus']).toDict())
+
+		return jsonify({"in_range":in_range,"result": "The message was sent to: "+str(in_range).replace('[','').replace(']','').replace('\'','')})
+
+
+@app.route('/API/User/RecvMsg/<idUser>', methods=['GET'])
+def RecvMsg(idUser):
+	collection = db['logs']
+	data =[]
+	for c in collection.find({"type": "message", "sent": 0, "to": idUser}):
+		toAdd = c['date'] + " - From: "+ c['from']+". "+c['message']
+		data.append(toAdd)
+		collection.update_one({"_id":c["_id"]},{"$set":{"sent": 1}})
+
+
+	# data = {}
+	# for key,values in Messages.items():
+	# 	if key == idUser:
+	# 		data[key] = values
+	# 		Messages[key] = []
+	return jsonify(data)
 
 @app.route('/API/User/DefineRange', methods=['POST'])
 def DefineRange():
@@ -359,18 +375,6 @@ def DefineRange():
 	in_range = []
 	in_range = get_users_in_range(session['username'])
 	return jsonify({"result":string, "range":UsersOn[i]['range'], "in_range": in_range})
-
-
-@app.route('/API/User/RecvMsg/<idUser>', methods=['GET'])
-def RecvMsg(idUser):
-	collection = db.logs
-	data = {}
-	for key,values in Messages.items():
-		if key == idUser:
-			data[key] = values
-			Messages[key] = []
-	return jsonify(data)
-
 
 # Bots API
 @app.route('/API/Bot/init', methods=['GET'])
@@ -482,27 +486,28 @@ def get_users_in_range(userid):
 	i=find_index(UsersOn, 'username', userid)
 	for u in UsersOn:
 		if u['location'] is None:
-			print("location do %s é None" % u['username'])
+			pass
 		elif u['username'] != userid and UsersOn[i]['range'] > calculateDistance(UsersOn[i]['location'][0],UsersOn[i]['location'][1], u['location'][0], u['location'][1]):
 			l.append(u['username'])
 	if l.__len__()==0:
 		l=None
-	print("RANGE:vou devolver:")
-	print(l)
+
 	return l
 
 @app.before_first_request
 def verify_wrong_logs():
 	collection = db['logs']
-	z=0
-	print("ola!")
 	for c in collection.find({"type":"move", "checkout":"0"}):
 		checkout = datetime.datetime.strptime(c["checkin"],'%Y-%m-%d %H:%M:%S.%f') + datetime.timedelta(minutes=1)
 		collection.update_one({"_id":c["_id"]},{"$set":{"checkout": str(checkout)}})
-		z += 1
-	print("c é %d"%z)
 	return
 
+# def verify_messages_not_sent(userID):
+# 	print("vv")
+# 	collection = db['logs']
+# 	for c in collection.find({"type":"message", "sent": 0, "to": userID}):
+# 		Messages[userID].append(c['Message'])
+# 	return
 
 if __name__ == '__main__':
 	app.run()
