@@ -3,11 +3,8 @@ from flask import jsonify, redirect
 from flask import request, render_template
 from flask import session, flash, abort
 from pymongo import MongoClient, errors
-import pprint
 import json
 import fenixedu
-from fenixedu import user
-import requests
 from math import radians, cos, sin, asin, sqrt
 import datetime
 from functools import wraps
@@ -16,9 +13,8 @@ from Logs import move_log, message_log
 import secrets
 
 
-Messages = {}
+Servers = []
 UsersOn = []
-
 #Bots Online
 BotsOn = {}
 #Available tokens to init bots
@@ -35,6 +31,12 @@ db = db_client['asint']
 def page_not_found(error):
 	flash("You were returned to the initial page due to an error:"
 		  " 404 - Page Not Found")
+	return render_template("siteinit.xhtml")
+
+@app.errorhandler(405)
+def page_not_found(error):
+	flash("You were returned to the initial page due to an error:"
+		  " 405 - Method Not Allowed")
 	return render_template("siteinit.xhtml")
 
 @app.errorhandler(400)
@@ -116,9 +118,6 @@ def main_user():
 	except KeyError:
 		abort(400)
 
-	print("Vou fazer print dos userson")
-	print(UsersOn)
-
 	user_ = client.get_user_by_code(code)
 	person = client.get_person(user_)
 	displayName = person['displayName']
@@ -128,8 +127,6 @@ def main_user():
 	if i == -1:
 		UsersOn.append({"username" : username, "name": displayName, "user":user_, "range":30, "a_token": user_.access_token, "count":1,
 						"building":None, "campus": None, "location":None})
-		Messages[username] = []
-		#verify_messages_not_sent(username)
 	else:
 		# Primeiro fazer o checkout da sessão que estava activa
 		collection = db['logs']
@@ -145,8 +142,6 @@ def main_user():
 	session['name'] = displayName
 	session['logged_in'] = True
 	session['a_token'] = user_.access_token
-	print("Novo usersON:")
-	print(UsersOn)
 
 	return redirect(url_for('MainpageDone'))
 
@@ -195,8 +190,14 @@ def BuildingList():
 
 @app.route('/API/Admin/GetListAllUsersLogged', methods=['POST'])
 def ListUsersLogged():
-		#  Ver UsersOn e perguntar aos outros servidores por users em sessions também.
-	return json.dumps(str(UsersOn))
+	#  Ver UsersOn e perguntar aos outros servidores por users em sessions também.
+	ON=[]
+	for i in UsersOn:
+		ON.append(i['username'])
+	if ON.__len__() ==0:
+		return json.dumps("There are no users logged in.")
+	else:
+		return json.dumps(str(ON))
 
 
 @app.route('/API/Admin/GetListAllUsersInBuild', methods=['POST'])
@@ -228,11 +229,11 @@ def getUserHistory():
 			#User history.
 			userID = content['userID']
 			collection = db["logs"]
-			if collection.count_documents({"userID" : userID}) == 0:
+			if collection.count_documents({"$or":[ {"user":userID}, {"to":userID}, {"from_":userID}]}) == 0:
 				return json.dumps("The are no logs for user %s." % userID)
 			else:
 				ret = []
-				for c in collection.find({"$or":[ {"user":userID}, {"to":userID}, {"from_":userID}]}, {'_id':False}).sort('date',1):
+				for c in collection.find({"$or":[ {"user":userID}, {"to":userID}, {"from_":userID}]}, {'_id':False}).sort('_id',1):
 					ret.append(c)
 				return json.dumps(str(ret))
 		elif content.__len__() == 2:
@@ -244,7 +245,7 @@ def getUserHistory():
 				return json.dumps("The are no logs for the building with ID %s in campus %s ." % (buildingID, campus))
 			else:
 				ret = []
-				for c in collection.find({"building": buildingID},{'_id':False}).sort('date',1):
+				for c in collection.find({"building": buildingID},{'_id':False}).sort('_id',1):
 					ret.append(c)
 				return json.dumps(str(ret))
 
@@ -261,7 +262,6 @@ def addLog():
 def addBot():
 	content=request.json
 	token = secrets.token_urlsafe(16)
-	#mensagem do admin {"addbot": ["campus","buildingID"]}
 	token_bot_queue.append(token)
 	BotsOn[token]=content["addbot"]
 	return jsonify({"token":token})
@@ -339,9 +339,14 @@ def SendMsg():
 		return jsonify({"result":"There are no users in the defined range. No message was sent"})
 	else:
 		for i in in_range:
-			Messages[i].append(content['Message'])
 			#  Insert in the DB. Then update if delivered - to solve sent messages that are not delivered.
-			collection.insert_one(message_log(str(datetime.datetime.now()),i,session['username'],content['Message'],UsersOn[z]['building'],UsersOn[z]['campus']).toDict())
+			if UsersOn[z]['building'] is None:
+				building = "None"
+				campus = "None"
+			else:
+				building = UsersOn[z]['building']
+				campus = UsersOn[z]['campus']
+			collection.insert_one(message_log(str(datetime.datetime.now()),i,session['username'],content['Message'],building,campus).toDict())
 
 		return jsonify({"in_range":in_range,"result": "The message was sent to: "+str(in_range).replace('[','').replace(']','').replace('\'','')})
 
@@ -355,12 +360,6 @@ def RecvMsg(idUser):
 		data.append(toAdd)
 		collection.update_one({"_id":c["_id"]},{"$set":{"sent": 1}})
 
-
-	# data = {}
-	# for key,values in Messages.items():
-	# 	if key == idUser:
-	# 		data[key] = values
-	# 		Messages[key] = []
 	return jsonify(data)
 
 @app.route('/API/User/DefineRange', methods=['POST'])
@@ -372,34 +371,51 @@ def DefineRange():
 	i=find_index(UsersOn,'username', session['username'])
 	UsersOn[i]['range']=float(content['Range'])
 	string = "Range updated to %s" % content['Range']
-	in_range = []
 	in_range = get_users_in_range(session['username'])
 	return jsonify({"result":string, "range":UsersOn[i]['range'], "in_range": in_range})
 
 # Bots API
-@app.route('/API/Bot/init', methods=['GET'])
-def get_bot_token():
-	print(token_bot_queue)
+@app.route('/API/Bot/init/<token>', methods=['GET'])
+def get_bot_token(token):
 	if len(token_bot_queue)==0:
-		print("erro")
-		return jsonify({"error": "no tokens available"})
+		return jsonify({"response": "NO"})
 	else:
-		return jsonify({"token": token_bot_queue.pop(0)})
+		i=0
+		while i< len(token_bot_queue):
+			if token_bot_queue[i] == token:
+				token_bot_queue.pop(i)
+				return jsonify({"response": "OK"})
+			i +=1
+	return jsonify({"response":"NO"})
 
-
-@app.route('/API/Bot/SendBroadMsg/<idBot>', methods=['POST'])
-def BotMsgHandle(idBot):
+@app.route('/API/Bot/SendBroadMsg', methods=['POST'])
+def BotMsgHandle():
 	collection = db.logs
 	content = request.get_json()
-	for obj in UsersOn:
-		#print(value)
-		#if value['Building'] == str(idBot):
-		print(Messages)
-		#if obj["campus"]==BotsOn[token][0] and obj["building"]==BotsOn[token][1]:
-		Messages[obj["username"]].append(content["content"])
-	return jsonify({"Result": "OK"})
+	bot_token = content["token"]
+	bot_message = content['content']
+	target_campus = BotsOn[bot_token][0]
+	target_building = BotsOn[bot_token][1]
+	in_building = get_users_in_building("BOT", target_building)
+	if in_building is None:
+		pass
+	else:
+		for i in in_building:
+			collection.insert_one(message_log(str(datetime.datetime.now()),i,"BOT",bot_message,target_building,target_campus).toDict())
+
+	return jsonify({"response": "OK"})
 
 # Other Servers API
+@app.route('/GetServerInRange',methods=["POST"])
+def get_server_in_range():
+	return
+@app.route('/GetServerInBuild',methods=["POST"])
+def get_server_in_build():
+	return
+@app.route('/GetServerOn', methods=["POST"])
+def get_server_on():
+	return
+
 # Vai ser preciso para quando uns users estão logged num server e outros noutros e é preciso procurar todos.
 
 #Outros
@@ -477,8 +493,6 @@ def get_users_in_building(userid, buildingid):
 			l.append(i['username'])
 	if l.__len__()==0:
 		l = None
-	print("vou devolver:")
-	print(l)
 	return l
 
 def get_users_in_range(userid):
@@ -498,16 +512,12 @@ def get_users_in_range(userid):
 def verify_wrong_logs():
 	collection = db['logs']
 	for c in collection.find({"type":"move", "checkout":"0"}):
-		checkout = datetime.datetime.strptime(c["checkin"],'%Y-%m-%d %H:%M:%S.%f') + datetime.timedelta(minutes=1)
-		collection.update_one({"_id":c["_id"]},{"$set":{"checkout": str(checkout)}})
+		if datetime.datetime.strptime(c["checkin"],'%Y-%m-%d %H:%M:%S.%f') <= datetime.datetime.now() - datetime.timedelta(minutes=2):
+			checkout = datetime.datetime.strptime(c["checkin"],'%Y-%m-%d %H:%M:%S.%f') + datetime.timedelta(minutes=1)
+			collection.update_one({"_id":c["_id"]},{"$set":{"checkout": str(checkout)}})
 	return
 
-# def verify_messages_not_sent(userID):
-# 	print("vv")
-# 	collection = db['logs']
-# 	for c in collection.find({"type":"message", "sent": 0, "to": userID}):
-# 		Messages[userID].append(c['Message'])
-# 	return
 
 if __name__ == '__main__':
+	session.clear()
 	app.run()

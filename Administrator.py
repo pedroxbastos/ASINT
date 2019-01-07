@@ -29,63 +29,74 @@ class AdminUI:
         db_client = MongoClient('mongodb://pedroxbastos:Pb9127416716@ds025180.mlab.com:25180/asint')
         db = db_client['asint']
         while not exit_:
-            print("\n\nChoose the function to be executed with its name:")
-            l = input("\n1-blocal -Insert Building Location\n"
-                      "2-ListLogged -List users logged in\n"
-                      "3-ListInside -List users inside a building\n"
-                      "4-UserHist - History of a user\n"
-                      "5-BuildingHist - History on a given buildin\n"
-                      "6-listbuildings - List available buildings\n"
-                      "7-AddBot - add a messaging bot\n"
-                      "8-quit\n"
-                      "9-insert - dummy logs insertion\n")
-            l = l.split()
-            if len(l) == 1:
-                command = l[0].upper()
-                if command == 'QUIT':
-                    print("Exiting app by user request.")
-                    exit_ = True
-                elif command == "INSERT":
-                    self.insertLog()
-                elif command == 'BLOCAL':
-                    self.insertBuildings()
-                elif command == 'LISTBUILDINGS':
-                    #  Retrieve list of buildings in the database
-                    campus = input("Which campus, taguspark, alameda, nuclear or all? ").lower()
-                    if campus in ['taguspark', 'alameda', 'nuclear', 'all']:
-                        self.getBuildings(campus)
-                    else:
-                        print("Wrong campus choice. PLease try again.")
+            try:
+                print("\n\nChoose the function to be executed with its name:")
+                l = input("\n1-blocal -Insert Building Location\n"
+                          "2-ListLogged -List users logged in\n"
+                          "3-ListInside -List users inside a building\n"
+                          "4-UserHist - History of a user\n"
+                          "5-BuildingHist - History on a given buildin\n"
+                          "6-listbuildings - List available buildings\n"
+                          "7-AddBot - add a messaging bot\n"
+                          "8-quit\n"
+                          "9-insert - dummy logs insertion\n")
+                l = l.split()
+                if len(l) == 1:
+                    command = l[0].upper()
+                    if command == 'QUIT':
+                        print("Exiting app by user request.")
+                        exit_ = True
+                    elif command == "INSERT":
+                        self.insertLog()
+                    elif command == 'BLOCAL':
+                        self.insertBuildings()
+                    elif command == 'LISTBUILDINGS':
+                        #  Retrieve list of buildings in the database
+                        campus = input("Which campus, taguspark, alameda, nuclear or all? ").lower()
+                        if campus in ['taguspark', 'alameda', 'nuclear', 'all']:
+                            self.getBuildings(campus)
+                        else:
+                            print("Wrong campus choice. PLease try again.")
 
-                elif command == 'LISTLOGGED':
-                    self.listLogged()
+                    elif command == 'LISTLOGGED':
+                        self.listLogged()
 
-                elif command == 'LISTINSIDE':
-                    campus = input("which campus?")
-                    if campus not in ["taguspark", "alameda", "nuclear"]:
-                        print("Wrong campus input.")
-                    else:
-                        buildingID = input("Which building ID?")
-                        self.listInside(buildingID, campus)
-                elif command == 'USERHIST':
-                    userID = input("What is the userID? ")
-                    if userID[:3] != "ist":
-                        print("Wrong input")
-                    else:
-                        self.getHistory(userID)
-                elif command == "BUILDINGHIST":
-                    campus = input("What campus?")
-                    if campus not in ["taguspark", "alameda", "nuclear"]:
-                        print("Wrong campus input.")
-                    else:
+                    elif command == 'LISTINSIDE':
+                        campus = input("which campus?")
+                        if campus not in ["taguspark", "alameda", "nuclear"]:
+                            print("Wrong campus input.")
+                        else:
+                            buildingID = input("Which building ID?")
+                            self.listInside(buildingID, campus)
+                    elif command == 'USERHIST':
+                        userID = input("What is the userID? ")
+                        if userID[:3] != "ist":
+                            print("Wrong input")
+                        else:
+                            self.getHistory(userID)
+                    elif command == "BUILDINGHIST":
+                        campus = input("What campus?")
+                        if campus not in ["taguspark", "alameda", "nuclear"]:
+                            print("Wrong campus input.")
+                        else:
+                            buildingID = input("What is the building ID?")
+                            self.getBHistory(campus,buildingID)
+                    elif command == "ADDBOT":
+                        campus = input("What campus?")
+                        if campus not in ["taguspark", "alameda", "nuclear"]:
+                            print("Wrong campus input.")
+                        else:
+                            L=[]
+                            for obj in db[campus].find():
+                                print(str(obj["name"]), obj["id"])
+                                L.append(obj["id"])
                         buildingID = input("What is the building ID?")
-                        self.getBHistory(campus,buildingID)
-                elif command == "ADDBOT":
-                    campus = input("What campus?")
-                    for obj in db[campus].find():
-                        print(str(obj["name"]), obj["id"])
-                    buildingID = input("What is the building ID?")
-                    self.insertBot(campus, buildingID)
+                        if buildingID in L:
+                            self.insertBot(campus, buildingID)
+                        else:
+                            print("No building with the given ID.")
+            except KeyboardInterrupt:
+                exit_=True
 
 
     def insertBuildings(self):
@@ -111,7 +122,6 @@ class AdminUI:
                     i = i + 1
                 payload = json.dumps(f_spaces)
                 r = requests.post("http://127.0.0.1:5000/API/Admin/GetBuildsLocations", json=payload)
-                print(r.status_code)
                 data = r.json()
                 print(data)
             except IOError:
@@ -136,7 +146,7 @@ class AdminUI:
                 print("No building in any campus yet.")
         else:
             for i in new:
-                print(i)
+                print(str(i))
         return
 
     def listInside(self, buildingID, campus):
@@ -148,9 +158,9 @@ class AdminUI:
             if len(new) == 0:
                 print("vazia")
             for i in new:
-                print(i)
+                print(str(i))
         except:
-            pass
+            print(data)
         return
 
     def getHistory(self, userID):
@@ -162,29 +172,29 @@ class AdminUI:
             if len(new) == 0:
                 print("vazia")
             for i in new:
-                print(i)
+                print(str(i))
         except:
-            pass
+            print(data)
         return
 
     def listLogged(self):
         r = requests.post("http://127.0.0.1:5000/API/Admin/GetListAllUsersLogged")
         data = r.json()
-        data2=json.loads(data.replace("'","\""))
-        if data2 == []:
-            print("No users logged in at the moment.")
-        else:
-            print("Users logged in: ")
-            for i in data2:
-                print(i)
+        try:
+            new = json.loads(data.replace("'", "\""))
+            if len(new) == 0:
+                print("vazia")
+            for i in new:
+                print(str(i))
+        except:
+            print(data)
         return
 
     def insertBot(self, campus, buildingID):
         r = requests.get("http://127.0.0.1:5000/API/Admin/Addbot", json={"addbot": [campus, buildingID]})
         data=r.json()
-        print(data)
-        self.token_bot_queue.append(str(data))
-        print(self.token_bot_queue)
+        print("Insert the following token in the new bot creation: ")
+        print(data['token'])
         return
 
     def insertLog(self):
@@ -217,7 +227,7 @@ class AdminUI:
             for i in new:
                 print(str(i))
         except:
-            pass
+            print(data)
         return
 
 if __name__ == '__main__':

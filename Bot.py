@@ -1,41 +1,50 @@
-import atexit
 import requests
 import sys
-import threading
-import json
-# v2.x version - see https://stackoverflow.com/a/38501429/135978
-# for the 3.x version
-#from apscheduler.scheduler import Scheduler
-#from flask import Flask
-
-#app = Flask(__name__)
-import sched, time
+import time
 
 class Bot:
 	def __init__(self):
-		print("ola")
-		r = requests.get("http://127.0.0.1:5000/API/Bot/init")
+		self.interval = int(input("Bot insertion\nDesired time interval in seconds?"))
+
+		self.message = input("Message to be shown?\n")
+		self.token = input("Insert the given administrator authorization token\n")
+
+		try:
+			r = requests.get("http://127.0.0.1:5000/API/Bot/init/"+self.token)
+		except requests.exceptions.RequestException as e:
+			print("Error trying to reach the server:\n%s\n\n. Please try again and make sure the server is online." % e)
+			exit(-1)
 		data = r.json()
-		for key, value in data.items():
-			if key != "error":
-				
-				self.token=str(data)
-				print("my token is: "+ self.token)
-				self.start_send()
-			else:
-				sys.exit(value)
+
+		if data["response"] == "OK":
+			print("Bot authorized! Starting...")
+			self.start_send()
+		else:
+			print("Bot not authorized. Exiting.")
+			sys.exit(0)
 
 	def start_send(self):
-		starttime=time.time()
 		while True:
-			Message = {"content": "Nao corram dentro do edificio sff"}
-			print("Doing stuff...")
-			payload = Message
-			r = requests.post("http://127.0.0.1:5000/API/Bot/SendBroadMsg/"+self.token, json=payload)
-			time.sleep(5.0 - ((time.time() - starttime) % 5.0))
+			try:
+				payload = {"content": self.message, "token": self.token}
+				try:
+					r = requests.post("http://127.0.0.1:5000/API/Bot/SendBroadMsg", json=payload)
+				except requests.exceptions.RequestException as e:
+					print("Error trying to reach the server:\n%s\n\n" % e)
+				if r.status_code == 200:
+					print("Bot message sent!")
+				else:
+					print("Bot message not sent!")
 
+				if r.json()["response"] == "OK":
+					time.sleep(self.interval)
+				else:
+					print("There was an error. Exiting")
+					sys.exit()
+			except KeyboardInterrupt:
+					print("Bot closing!")
+					sys.exit()
 
-	
 if __name__ == '__main__':
     Bot = Bot()
 

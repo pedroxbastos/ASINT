@@ -5,6 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.5"></meta>
 
     <style>
         div.background {
@@ -142,10 +143,13 @@
                         $( "#LogoutForm" ).trigger( "submit" );
                     }else{
                         $("#serverresp").text(response["result"]);
-                        $("#in_range").text("The following users are in the defined messaging range: "+response['in_range']);
+                        if(response['in_range']){
+                            $("#in_range").text("The following users are in the defined messaging range: "+response['in_range']);
+                        }
                     }
                 }
             });
+            $("#Messagetosend").val('');
         });
 
         $( "#LogoutForm" ).submit(function ( event ) {
@@ -166,16 +170,18 @@
                 dataType: "json",
                 contentType: "application/json",
                 success: function (data) {
-                    console.log(data);
-                    s = "<ul>";
-                    for (var i = 0, len = data.length; i < len; i++) {
-                        s += "<li>";
-                        s += data[i];
-                        s += "</li>";
+                    if(data["result"]==-1){
+                        $( "#LogoutForm" ).trigger( "submit" );
+                    }else{
+                        s = "<ul>";
+                        for (var i = 0, len = data.length; i < len; i++) {
+                            s += "<li>";
+                            s += data[i];
+                            s += "</li>";
+                        }
+                        s += "</ul>";
+                        $("#fieldMsg").append(s);
                     }
-                    s += "</ul>";
-                    $("#fieldMsg").append(s);
-
                 }
             });
         });
@@ -205,6 +211,7 @@
                     console.log(xhr);
                 }
             });
+            $("#Range").val('');
         });
     });
  //]]>
