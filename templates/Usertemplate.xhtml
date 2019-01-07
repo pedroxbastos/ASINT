@@ -113,7 +113,7 @@
 
         $.ajax({
             type: "POST",
-            url: "http://127.0.0.1:5000/API/User/PostmyLocation",
+            url: "https://asint1-227912.appspot.com/API/User/PostmyLocation",
             contentType: "application/json; charset=utf-8",
             data:JSON.stringify(postData),
             dataType: 'json',
@@ -134,7 +134,7 @@
             var authname = document.getElementById("authenticate").innerHTML;
             $.ajax({
                 type: "POST",
-                url: "http://127.0.0.1:5000/API/User/SendBroadMsg",
+                url: "https://asint1-227912.appspot.com/API/User/SendBroadMsg",
                 dataType: "json",
                 contentType: "application/json",
                 data: '{"name":"' + authname + '","Message":"' + $("#Messagetosend").val() + '"}',
@@ -166,7 +166,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "http://127.0.0.1:5000/API/User/RecvMsg/"+authname,
+                url: "https://asint1-227912.appspot.com/API/User/RecvMsg/"+authname,
                 dataType: "json",
                 contentType: "application/json",
                 success: function (data) {
@@ -190,7 +190,7 @@
             var authname = document.getElementById("authenticate").innerHTML;
             $.ajax({
                 type: "POST",
-                url: "http://127.0.0.1:5000/API/User/DefineRange",
+                url: "https://asint1-227912.appspot.com/API/User/DefineRange",
                 dataType: "json",
                 contentType: "application/json",
                 data: '{"name":"' + authname + '","Range":"' + $("#Range").val() + '"}',

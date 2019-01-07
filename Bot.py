@@ -10,7 +10,7 @@ class Bot:
 		self.token = input("Insert the given administrator authorization token\n")
 
 		try:
-			r = requests.get("http://127.0.0.1:5000/API/Bot/init/"+self.token)
+			r = requests.get("https://asint1-227912.appspot.com/API/Bot/init/"+self.token)
 		except requests.exceptions.RequestException as e:
 			print("Error trying to reach the server:\n%s\n\n. Please try again and make sure the server is online." % e)
 			exit(-1)
@@ -28,7 +28,7 @@ class Bot:
 			try:
 				payload = {"content": self.message, "token": self.token}
 				try:
-					r = requests.post("http://127.0.0.1:5000/API/Bot/SendBroadMsg", json=payload)
+					r = requests.post("https://asint1-227912.appspot.com/API/Bot/SendBroadMsg", json=payload)
 				except requests.exceptions.RequestException as e:
 					print("Error trying to reach the server:\n%s\n\n" % e)
 				if r.status_code == 200:

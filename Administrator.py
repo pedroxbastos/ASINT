@@ -7,6 +7,7 @@ from Logs import message_log, move_log
 import os.path
 from pymongo import MongoClient, errors
 
+
 class AdminUI:
     def __init__(self):
         self.token_bot_queue = []
@@ -121,7 +122,7 @@ class AdminUI:
                     f_spaces.append(b.toDict())
                     i = i + 1
                 payload = json.dumps(f_spaces)
-                r = requests.post("http://127.0.0.1:5000/API/Admin/GetBuildsLocations", json=payload)
+                r = requests.post("https://asint1-227912.appspot.com/API/Admin/GetBuildsLocations", json=payload)
                 data = r.json()
                 print(data)
             except IOError:
@@ -136,7 +137,7 @@ class AdminUI:
 
     def getBuildings(self, campus):
         payload = {"campus": campus}
-        r = requests.post("http://127.0.0.1:5000/API/Admin/GetBuildingList", json=payload)
+        r = requests.post("https://asint1-227912.appspot.com/API/Admin/GetBuildingList", json=payload)
         data = r.json()
         new = json.loads(data.replace("'","\""))
         if new == []:
@@ -151,7 +152,7 @@ class AdminUI:
 
     def listInside(self, buildingID, campus):
         payload = {"building_id" : buildingID, "campus" : campus}
-        r = requests.post("http://127.0.0.1:5000/API/Admin/GetListAllUsersInBuild", json=payload)
+        r = requests.post("https://asint1-227912.appspot.com/API/Admin/GetListAllUsersInBuild", json=payload)
         data = r.json()
         try:
             new = json.loads(data.replace("'", "\""))
@@ -165,7 +166,7 @@ class AdminUI:
 
     def getHistory(self, userID):
         payload = {"userID": userID}
-        r = requests.post("http://127.0.0.1:5000/API/Admin/GetListHistory", json=payload)
+        r = requests.post("https://asint1-227912.appspot.com/API/Admin/GetListHistory", json=payload)
         data = r.json()
         try:
             new = json.loads(data.replace("'", "\""))
@@ -178,7 +179,7 @@ class AdminUI:
         return
 
     def listLogged(self):
-        r = requests.post("http://127.0.0.1:5000/API/Admin/GetListAllUsersLogged")
+        r = requests.post("https://asint1-227912.appspot.com/API/Admin/GetListAllUsersLogged")
         data = r.json()
         try:
             new = json.loads(data.replace("'", "\""))
@@ -191,7 +192,8 @@ class AdminUI:
         return
 
     def insertBot(self, campus, buildingID):
-        r = requests.get("http://127.0.0.1:5000/API/Admin/Addbot", json={"addbot": [campus, buildingID]})
+        r = requests.post("https://asint1-227912.appspot.com/API/Admin/Addbot", json={"addbot": [campus, buildingID]})
+        print(r)
         data=r.json()
         print("Insert the following token in the new bot creation: ")
         print(data['token'])
@@ -212,13 +214,13 @@ class AdminUI:
 
         print(l)
         payload = json.dumps(l.toDict())
-        r = requests.post("http://127.0.0.1:5000/API/insert", json=payload)
+        r = requests.post("https://asint1-227912.appspot.com/API/insert", json=payload)
         print(r.status_code)
         return
 
     def getBHistory(self, campus, BuildingID):
         payload = {"campus": campus, "buildingID": BuildingID }
-        r = requests.post("http://127.0.0.1:5000/API/Admin/GetListHistory", json=payload)
+        r = requests.post("https://asint1-227912.appspot.com/API/Admin/GetListHistory", json=payload)
         data = r.json()
         try:
             new = json.loads(data.replace("'", "\""))

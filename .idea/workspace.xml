@@ -5,9 +5,16 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Administrator.py" beforeDir="false" afterPath="$PROJECT_DIR$/Administrator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Bot1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/User.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build1.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dbconnectexample.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fenixedu.ini" beforeDir="false" afterPath="$PROJECT_DIR$/fenixedu.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fenixedu.sample.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/python" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/Usertemplate.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/Usertemplate.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/siteinit.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/siteinit.xhtml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,20 +26,17 @@
     <favorites_list name="ASINT" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5960814">
+    <splitter split-orientation="horizontal" split-proportion="0.52683294">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Administrator.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="196">
-                  <caret line="98" column="26" selection-start-line="98" selection-start-column="26" selection-end-line="98" selection-end-column="26" />
+                <state relative-caret-position="239">
+                  <caret line="194" column="103" lean-forward="true" selection-start-line="194" selection-start-column="8" selection-end-line="194" selection-end-column="103" />
                   <folding>
                     <element signature="e#0#15#0" expanded="true" />
                     <element signature="e#272#661#0" />
-                    <element signature="e#3775#5447#0" />
-                    <element signature="e#5493#5951#0" />
-                    <element signature="e#7536#8141#0" />
                   </folding>
                 </state>
               </provider>
@@ -41,23 +45,36 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Logs.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="247">
-                  <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+                <state relative-caret-position="130">
+                  <caret line="19" selection-start-line="19" selection-end-line="19" />
                 </state>
               </provider>
             </entry>
           </file>
           <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/app.py">
+            <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="131">
-                  <caret line="410" column="10" lean-forward="true" selection-start-line="410" selection-start-column="10" selection-end-line="410" selection-end-column="10" />
+                <state relative-caret-position="-1969">
+                  <caret line="336" column="32" selection-start-line="336" selection-start-column="32" selection-end-line="336" selection-end-column="32" />
                   <folding>
                     <element signature="e#0#32#0" expanded="true" />
-                    <element signature="e#1995#2511#0" />
-                    <element signature="e#11753#12152#0" />
-                    <element signature="e#14841#14978#0" />
+                    <element signature="e#2257#2943#0" />
+                    <element signature="e#3020#4264#0" />
+                    <element signature="e#4405#4929#0" />
+                    <element signature="e#5011#5408#0" />
+                    <element signature="e#5499#5889#0" />
+                    <element signature="e#5983#6615#0" />
+                    <element signature="e#6699#7687#0" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/fenixedu.ini">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="143">
+                  <caret line="11" column="13" lean-forward="true" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
                 </state>
               </provider>
             </entry>
@@ -65,8 +82,11 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Bot.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-143">
-                  <caret line="1" column="10" selection-start-line="1" selection-start-column="10" selection-end-line="1" selection-end-column="10" />
+                <state relative-caret-position="229">
+                  <caret line="21" column="13" lean-forward="true" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+                  <folding>
+                    <element signature="e#0#15#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -78,7 +98,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/templates/siteinit.xhtml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-149">
+                <state relative-caret-position="91">
                   <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
                 </state>
               </provider>
@@ -87,7 +107,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/templates/jquery-ui.css">
               <provider selected="true" editor-type-id="text-editor">
-                <state>
+                <state relative-caret-position="16900">
                   <caret line="1300" column="1" selection-start-line="1300" selection-start-column="1" selection-end-line="1300" selection-end-column="1" />
                 </state>
               </provider>
@@ -96,20 +116,17 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/templates/Usertemplate.xhtml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="96">
-                  <caret line="183" column="21" selection-start-line="183" selection-start-column="21" selection-end-line="183" selection-end-column="21" />
+                <state relative-caret-position="213">
+                  <caret line="192" column="55" selection-start-line="192" selection-start-column="55" selection-end-line="192" selection-end-column="55" />
                 </state>
               </provider>
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/User.py">
+            <entry file="file://$PROJECT_DIR$/building.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state>
-                  <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
-                  <folding>
-                    <element signature="e#0#40#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="182">
+                  <caret line="14" column="41" lean-forward="true" selection-start-line="14" selection-start-column="41" selection-end-line="14" selection-end-column="41" />
                 </state>
               </provider>
             </entry>
@@ -129,9 +146,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>sendtoken</find>
-      <find>authenticate</find>
-      <find>getToken</find>
       <find>log</find>
       <find>for</find>
       <find>count_</find>
@@ -158,7 +172,14 @@
       <find>Bot =</find>
       <find>&gt;</find>
       <find>Messages</find>
+      <find>127</find>
+      <find>sec</find>
+      <find>http://127.0.0.1:500</find>
+      <find>http://127.0.0.1:5000</find>
     </findStrings>
+    <replaceStrings>
+      <replace>https://asint1-227912.appspot.com</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -175,7 +196,6 @@
         <option value="$PROJECT_DIR$/templates/a.html" />
         <option value="$PROJECT_DIR$/DesktopApp.py" />
         <option value="$PROJECT_DIR$/Server.py" />
-        <option value="$PROJECT_DIR$/fenixedu.ini" />
         <option value="$PROJECT_DIR$/reset.css" />
         <option value="$PROJECT_DIR$/styles.css" />
         <option value="$PROJECT_DIR$/homepage.xhtml" />
@@ -184,8 +204,9 @@
         <option value="$PROJECT_DIR$/templates/homepage.xhtml" />
         <option value="$PROJECT_DIR$/Logs.py" />
         <option value="$PROJECT_DIR$/templates/siteinit.xhtml" />
-        <option value="$PROJECT_DIR$/Bot.py" />
+        <option value="$PROJECT_DIR$/fenixedu.ini" />
         <option value="$PROJECT_DIR$/templates/Usertemplate.xhtml" />
+        <option value="$PROJECT_DIR$/Bot.py" />
         <option value="$PROJECT_DIR$/Administrator.py" />
         <option value="$PROJECT_DIR$/app.py" />
       </list>
@@ -294,8 +315,8 @@
     <frame x="0" y="25" width="1600" height="875" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49671772" visible="true" weight="0.13942932" />
-      <window_info id="Structure" order="1" sideWeight="0.50328225" side_tool="true" visible="true" weight="0.13942932" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49671772" visible="true" weight="0.14202334" />
+      <window_info id="Structure" order="1" sideWeight="0.50328225" side_tool="true" weight="0.13942932" />
       <window_info id="Favorites" order="2" sideWeight="0.5010352" side_tool="true" weight="0.13553827" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -305,9 +326,9 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32963988" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49946293" visible="true" weight="0.367036" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49946293" visible="true" weight="0.28531855" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50053704" side_tool="true" weight="0.28417653" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.26869807" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.42797783" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -352,10 +373,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-896">
           <caret line="5" column="14" lean-forward="true" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
-          <folding>
-            <element signature="e#1026#1078#0" />
-            <element signature="e#1173#1225#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -364,45 +381,14 @@
         <state relative-caret-position="-798" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fenixedu.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="56">
-          <caret line="4" column="102" selection-start-line="4" selection-start-column="102" selection-end-line="4" selection-end-column="102" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/jhgf.py" />
     <entry file="file://$PROJECT_DIR$/static/homepage.xhtml" />
     <entry file="file://$PROJECT_DIR$/static/reset.css" />
     <entry file="file://$PROJECT_DIR$/static/styles.css" />
-    <entry file="file://$PROJECT_DIR$/templates/jquery-ui.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="1300" column="1" selection-start-line="1300" selection-start-column="1" selection-end-line="1300" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/User.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#40#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharmCE2018.3/system/python_stubs/-1976055750/builtins.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="163">
           <caret line="780" column="8" selection-start-line="780" selection-start-column="8" selection-end-line="780" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/siteinit.xhtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-149">
-          <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
         </state>
       </provider>
     </entry>
@@ -413,50 +399,104 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/templates/jquery-ui.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16900">
+          <caret line="1300" column="1" selection-start-line="1300" selection-start-column="1" selection-end-line="1300" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Bot1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-37">
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/User.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fenixedu.sample.ini">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/building.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="14" column="41" lean-forward="true" selection-start-line="14" selection-start-column="41" selection-end-line="14" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/siteinit.xhtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/templates/Usertemplate.xhtml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="183" column="21" selection-start-line="183" selection-start-column="21" selection-end-line="183" selection-end-column="21" />
+        <state relative-caret-position="213">
+          <caret line="192" column="55" selection-start-line="192" selection-start-column="55" selection-end-line="192" selection-end-column="55" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Logs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Bot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-143">
-          <caret line="1" column="10" selection-start-line="1" selection-start-column="10" selection-end-line="1" selection-end-column="10" />
+        <state relative-caret-position="130">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Administrator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="98" column="26" selection-start-line="98" selection-start-column="26" selection-end-line="98" selection-end-column="26" />
+        <state relative-caret-position="239">
+          <caret line="194" column="103" lean-forward="true" selection-start-line="194" selection-start-column="8" selection-end-line="194" selection-end-column="103" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
             <element signature="e#272#661#0" />
-            <element signature="e#3775#5447#0" />
-            <element signature="e#5493#5951#0" />
-            <element signature="e#7536#8141#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app.py">
+    <entry file="file://$PROJECT_DIR$/fenixedu.ini">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="131">
-          <caret line="410" column="10" lean-forward="true" selection-start-line="410" selection-start-column="10" selection-end-line="410" selection-end-column="10" />
+        <state relative-caret-position="143">
+          <caret line="11" column="13" lean-forward="true" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Bot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="21" column="13" lean-forward="true" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1969">
+          <caret line="336" column="32" selection-start-line="336" selection-start-column="32" selection-end-line="336" selection-end-column="32" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
-            <element signature="e#1995#2511#0" />
-            <element signature="e#11753#12152#0" />
-            <element signature="e#14841#14978#0" />
+            <element signature="e#2257#2943#0" />
+            <element signature="e#3020#4264#0" />
+            <element signature="e#4405#4929#0" />
+            <element signature="e#5011#5408#0" />
+            <element signature="e#5499#5889#0" />
+            <element signature="e#5983#6615#0" />
+            <element signature="e#6699#7687#0" />
           </folding>
         </state>
       </provider>
